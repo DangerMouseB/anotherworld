@@ -48,7 +48,7 @@ class StreamToLines(object):
 
 
 
-class AssertRaises(object):
+class assertRaises(object):
 
     def __init__(self, expectedExceptionType):
         self.expectedExceptionType = expectedExceptionType

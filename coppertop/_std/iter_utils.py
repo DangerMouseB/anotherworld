@@ -17,36 +17,40 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
+
+from coppertop._pipe import pipeable, binary
 
 
 # iter iteration (rather than range iteration)
 
-@Pipeable
-def Each(xs, f):
+@pipeable(flavour=binary)
+def each(xs, f):
     """each(xs, f)  e.g. xs >> Each >> f
     Answers [f(x) for x in xs]"""
     return [f(x) for x in xs]
 
-@Pipeable
-def EachIf(xs, f, ifF):
-    """each(xs, f)  e.g. xs >> EachIf >> f >> ifF
-    Answers [f(x) for x in xs]"""
-    return [f(x) for x in xs if ifF(x)]
 
-@Pipeable
-def Chain(seed, xs, f):
-    """chain(seed, xs, f)    e.g. xs >> Chain(seed) >> f
-    Answers resultn where resulti=f(prior, xi) for each x in xs
-    prior = resulti-1 or seed initially"""
-    prior = seed
-    for x in xs:
-        prior = f(prior, x)
-    return prior
-
-@Pipeable
-def EachArgs(listOfArgs, f):
-    """eachArgs(f, listOfArgs)
-    Answers [f(*args) for args in listOfArgs]"""
-    return [f(*args) for args in listOfArgs]
+# @pipeable
+# def EachIf(xs, f, ifF):
+#     """each(xs, f)  e.g. xs >> EachIf >> f >> ifF
+#     Answers [f(x) for x in xs]"""
+#     return [f(x) for x in xs if ifF(x)]
+#
+# @pipeable
+# def Chain(seed, xs, f):
+#     """chain(seed, xs, f)    e.g. xs >> Chain(seed) >> f
+#     Answers resultn where resulti=f(prior, xi) for each x in xs
+#     prior = resulti-1 or seed initially"""
+#     prior = seed
+#     for x in xs:
+#         prior = f(prior, x)
+#     return prior
+#
+# @pipeable
+# def EachArgs(listOfArgs, f):
+#     """eachArgs(f, listOfArgs)
+#     Answers [f(*args) for args in listOfArgs]"""
+#     return [f(*args) for args in listOfArgs]

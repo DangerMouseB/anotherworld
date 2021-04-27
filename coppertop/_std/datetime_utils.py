@@ -19,53 +19,56 @@
 # TODO handle locales
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
+
+from coppertop._pipe import pipeable
 from .._core import Missing
 
 
 
-@Pipeable
+@pipeable
 def Year(x):
     return x.year
 
-@Pipeable
+@pipeable
 def Month(x):
     return x.month
 
-@Pipeable
+@pipeable
 def Day(x):
     return x.day
 
-@Pipeable
+@pipeable
 def Hour(x):
     return x.hour
 
-@Pipeable
+@pipeable
 def Minute(x):
     return x.minute
 
-@Pipeable
+@pipeable
 def Second(x):
     return x.second
 
-@Pipeable
+@pipeable
 def Weekday(x):
     return x.weekday()
 
-@Pipeable
+@pipeable
 def WeekdayName(x, locale=Missing):
     return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][x]
 
-@Pipeable
+@pipeable
 def WeekdayLongName(x, locale=Missing):
     return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x]
 
-@Pipeable
+@pipeable
 def MonthName(month, locale=Missing):
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]
 
-@Pipeable
+@pipeable
 def MonthLongName(month, locale=Missing):
     return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]
 

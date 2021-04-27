@@ -60,35 +60,35 @@ from coppertop import *
 from coppertop import Null
 
 # ?datesInYear
-@Pipeable
+@pipeable
 def DatesInYear(year):
      return FnAdapterFRange(year >> _IthDateInYear)
-@Pipeable
+@pipeable
 def _IthDateInYear(year, i):
     ithDate = time.AbstractDate(year, 1, 1) >> AddPeriod(DaySecond(i))
     return FnAdapterFRange.Empty if ithDate.year != year else ithDate
 
 
 # ?byMonth
-@Pipeable
+@pipeable
 def MonthChunks(datesR):
     return datesR >> ChunkFROnChangeOf >> (lambda x: x.month)
 
 
 # ?byWeek
-@Pipeable
+@pipeable
 def _UntilWeekdayName(datesR, weekdayName):
     return datesR >> Until(f=lambda d: d >> Weekday >> WeekdayName == weekdayName)
 WeekChunks = ChunkUsingSubRangeGenerator(_UntilWeekdayName(weekdayName='Sun'))
 
 
-@Pipeable
+@pipeable
 def DateAsDayString(d):
     return d >> Day >> ToStr >> RJust(3)
 
 
 # ?formatWeek
-@Pipeable
+@pipeable
 class WeekStrings(IForwardRange):
     def __init__(self, rOfWeeks):
         self.rOfWeeks = rOfWeeks
@@ -116,13 +116,13 @@ class WeekStrings(IForwardRange):
 
 
 # ?monthTitle
-@Pipeable
+@pipeable
 def MonthTitle(month, width):
     return month >> MonthLongName >> CJust(width)
 
 
 # ?formatMonth
-@Pipeable
+@pipeable
 def MonthLines(monthDays):
     return [
         MonthTitle(monthDays.front.month, 21) >> WrapInList >> IndexableFR,
@@ -130,7 +130,7 @@ def MonthLines(monthDays):
     ] >> ChainAsSingleRange
 
 
-@Pipeable
+@pipeable
 def MonthStringsToCalendarRow(strings, blank, sep):
     return strings >> Materialise >> ReplaceWith(Null, blank) >> JoinUsing(sep)
 

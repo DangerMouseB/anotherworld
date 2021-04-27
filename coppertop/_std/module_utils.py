@@ -18,17 +18,20 @@
 
 
 import sys
-from ..pipeable import Pipeable
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-@Pipeable
-def EnsurePath(path):
+from coppertop._pipe import pipeable
+
+
+@pipeable
+def ensurePath(path):
     import sys
     if path not in sys.path:
         sys.path.insert(0, path)
 
-@Pipeable
-def PrintModules(root=''):
+@pipeable
+def printModules(root=''):
     noneNames = []
     moduleNames = []
     for k, v in sys.modules.items():
@@ -46,8 +49,8 @@ def PrintModules(root=''):
     for name in moduleNames:
         print(name)
 
-@Pipeable
-def Unload(module_name, leave_relative_imports_optimisation=False):
+@pipeable
+def unload(module_name, leave_relative_imports_optimisation=False):
     # for description of relative imports optimisation in earlier versions of python see:
     # http://www.python.org/dev/peps/pep-0328/#relative-imports-and-indirection-entries-in-sys-modules
 

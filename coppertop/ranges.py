@@ -29,12 +29,13 @@
 from __future__ import annotations
 import sys, types
 
-from coppertop import Pipeable, PipeableFunction
+from coppertop import pipeable
+from ._pipe import Pipeable
 from ._core import Null
 from .range_interfaces import IForwardRange, IOutputRange, IInputRange, IRandomAccessInfinite
 
 
-@Pipeable
+@pipeable
 def ToIRangeIfNot(x):
     if isinstance(x, IInputRange):
         return x
@@ -80,7 +81,7 @@ class FnAdapterFRange(IForwardRange):
         return 'FnAdapterFRange(%s)[%s]' % (self.f, self.i)
 
 
-@Pipeable
+@pipeable
 class ChunkFROnChangeOf(IForwardRange):
     def __init__(self, r, f):
         assert isinstance(r, IForwardRange)
@@ -125,7 +126,7 @@ class _Chunk(IForwardRange):
         return '_Chunk(%s)' % self.curF
 
 
-@Pipeable
+@pipeable
 class Until(IForwardRange):
     def __init__(self, r, f):
         if not isinstance(r, IForwardRange):
@@ -151,7 +152,7 @@ class Until(IForwardRange):
         return 'Until(%s,%s)' % (self.r, self.f)
 
 
-@Pipeable
+@pipeable
 class ChunkUsingSubRangeGenerator(IForwardRange):
     def __init__(self, f, r):
         self.r = r
@@ -173,7 +174,7 @@ class ChunkUsingSubRangeGenerator(IForwardRange):
         return new
 
 
-@Pipeable
+@pipeable
 class IndexableFR(IForwardRange):
     def __init__(self, indexable):
         self.indexable = indexable
@@ -192,7 +193,7 @@ class IndexableFR(IForwardRange):
         return new
 
 
-@Pipeable
+@pipeable
 class ListOR(IOutputRange):
     def __init__(self, list):
         self.list = list
@@ -200,7 +201,7 @@ class ListOR(IOutputRange):
         self.list.append(value)
 
 
-@Pipeable
+@pipeable
 class ChainAsSingleRange(IForwardRange):
     def __init__(self, listOfRanges):
         self.rOfR = listOfRanges >> IndexableFR
@@ -225,7 +226,7 @@ class ChainAsSingleRange(IForwardRange):
             self.curR.popFront()
 
 
-@Pipeable
+@pipeable
 def Materialise(r):
     answer = _MaterialisedRange()
     while not r.empty:
@@ -244,11 +245,11 @@ class _MaterialisedRange(list):
 
 
 # RMap rather than Map to make explicit that it is unrelated to python's map
-@Pipeable
+@pipeable
 class RMap(IForwardRange):
     def __init__(self, r, fn):
         self.r = r >> ToIRangeIfNot
-        if type(fn) != types.FunctionType and type(fn) != PipeableFunction:
+        if type(fn) != types.FunctionType and type(fn) != Pipeable:
             raise TypeError("RMAP.__init__ fn should be a function but got a %s" % type(fn))
         self.f = fn
     @property
@@ -263,7 +264,7 @@ class RMap(IForwardRange):
         return RMap(self.r.save(), self.f)
 
 
-@Pipeable
+@pipeable
 class FileLineIR(IInputRange):
     def __init__(self, f, stripNL=False):
         self.f = f
@@ -278,7 +279,7 @@ class FileLineIR(IInputRange):
         self.line = self.f.readline()
 
 
-@Pipeable
+@pipeable
 class RRaggedZip(IInputRange):
     """As RZip but input ranges do not need to be of same length, shorter ranges are post padded with Null"""
     def __init__(self, ror):
@@ -312,7 +313,7 @@ class RRaggedZip(IInputRange):
             ror.popFront()
 
 
-@Pipeable
+@pipeable
 def AllSubRangesExhausted(ror):
     ror = ror.save()
     answer = True

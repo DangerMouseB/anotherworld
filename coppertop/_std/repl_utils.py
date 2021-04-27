@@ -17,9 +17,14 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
 from pprint import pprint
 from copy import copy
-from ..pipeable import Pipeable
+from coppertop._pipe import pipeable
+
 
 
 _list_iter_type = type(iter([]))
@@ -44,10 +49,19 @@ _numpy = None        # don't import numpy proactively
 # [repr Fred]
 # repr Fred
 
-@Pipeable(leftToRight=True, rightToLeft=True)
-def _callFReturnX(f, x):
-    f(x)
-    return x
+
+class _callFReturnX(object):
+    def __init__(self, f):
+        self.f = f
+    def __rrshift__(self, other):   # other >> self
+        self.f(other)
+        return other
+    def __lshift__(self, other):    # self << other
+        self.f(other)
+        return self
+    def __repr__(self):
+        return ""
+
 
 def _printRepr(x):
     print(repr(x))
@@ -72,7 +86,7 @@ def _printType(x):
     print(type(x))
 TT = _callFReturnX(_printType)
 
-@Pipeable
+@pipeable
 def IsNdArray(x):
     global _numpy
     if type(x).__name__ != "ndarray":
@@ -141,6 +155,6 @@ class _PipeablePrintSplitCR(object):
 CRPP = _PipeablePrintSplitCR()
 
 
-@Pipeable
+@pipeable
 def Pipeables(arg):
-    return sorted([k for k, v in arg.items() if isinstance(v, (Pipeable,))])
+    return sorted([k for k, v in arg.items() if isinstance(v, (pipeable,))])

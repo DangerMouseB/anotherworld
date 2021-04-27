@@ -17,13 +17,17 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
 from .iter_utils import *
 from .datetime_utils import *
 from .list_utils import *
 from .math_utils import *
 from .misc import *
 from .module_utils import *
-from .pipe_utils import *
+# from .pipe_utils import *
 from .range_utils import *
 from .repl_utils import *
 from .stdio import *

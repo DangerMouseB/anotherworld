@@ -19,17 +19,17 @@
 
 import operator
 from ..testing import AssertEqual
-from ..pipeable import Pipeable
+from coppertop._pipe import pipeable
 from coppertop._std import Chain, Each, EachArgs
 
 def test_stuff():
     2 >> AssertEqual >> 2
 
-    @Pipeable
+    @pipeable
     def SquareIt(x):
         return x * x
 
-    @Pipeable
+    @pipeable
     def Add(x, y):
         return x + y
 

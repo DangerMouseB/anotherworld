@@ -1,6 +1,6 @@
 # *******************************************************************************
 #
-#    Copyright (c) 2011-2020 David Briant
+#    Copyright (c) 2011-2021 David Briant
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
 #    limitations under the License.
 #
 # *******************************************************************************
+
+
+import sys
+# sys._ImportTrace = True
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
 
 
 _all = set(['Missing', 'Null', 'getMyPublicMembers', 'getPublicMembersOf'])
@@ -34,29 +41,28 @@ def _getPublicMembersOnly(module):
             if name[0:len(parentName)] == parentName:
                 return True
         return False
-    names = ['coppertop.pipeable', module.__name__]
+    names = ['coppertop.flavoured', module.__name__]
     members = [(name, o) for (name, o) in inspect.getmembers(module) if (name[0:1] != '_')]         # remove private
     members = [(name, o) for (name, o) in members if not (inspect.isbuiltin(o) or inspect.ismodule(o))]   # remove built-ins and modules
     members = [(name, o) for (name, o) in members if _isInOrIsChildOf(o.__module__, names)]   # keep all pipeables and children
     return [name for (name, o) in members]
 
 
-from ._core import Missing, Null
+from ._core import Missing, Null, ProgrammerError, PathNotTested, NotYetImplemented
 
 
 # the following are wrapped in exception handlers to make testing and debugging of coppertop easier
 
 try:
-    from . import _testing
+    from . import _testing, _pipe
     from ._testing import *
     _all.update(_getPublicMembersOnly(_testing))
 except:
     pass
 
 try:
-    from . import pipeable
-    from .pipeable import *
-    _all.update(_getPublicMembersOnly(pipeable))
+    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary
+    _all.update(_getPublicMembersOnly(_pipe))
 except:
     pass
 

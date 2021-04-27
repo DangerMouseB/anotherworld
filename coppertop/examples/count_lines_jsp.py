@@ -80,7 +80,7 @@ def countLinesRanges2(f):
     return out.list
 
 
-@Pipeable
+@pipeable
 def CountEquals(r, value):
     count = 0
     while not r.empty and r.front == value:
@@ -94,7 +94,7 @@ def countLinesRanges3(f):
     return FileLineIR(f) >> RepititionCounter >> PushInto >> ListOR([]) >> GetAttr >> 'list'
 
 
-@Pipeable
+@pipeable
 def RepititionCounter(r):
     return _RepititionCounter(r)
 

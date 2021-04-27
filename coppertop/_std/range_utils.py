@@ -17,56 +17,59 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
 
-@Pipeable(leftToRight=True, pipeOnly=True)
+from coppertop._pipe import pipeable
+
+@pipeable
 def PushInto(inR, outR):
     while not inR.empty:
         outR.put(inR.front)
         inR.popFront()
     return outR
 
-@Pipeable(rightToLeft=True)
+@pipeable
 def PullFrom(inR, outR):
     while not inR.empty:
         outR.put(inR.front)
         inR.popFront()
     return None
 
-@Pipeable
+@pipeable
 def RZip(r):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RFold(r, f):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RFoldSeed(seed, r, f):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RFilter(r, f):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RTake(r, n):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RTakeBack(r, n):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RDrop(r, n):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def RDropBack(r, n):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def Find(r, value):
     while not r.empty:
         if r.front == value:
@@ -74,32 +77,32 @@ def Find(r, value):
         r.popFront()
     return r
 
-@Pipeable
+@pipeable
 def Put(r, x):
     return r.put(x)
 
-@Pipeable
+@pipeable
 def Front(r):
     return r.front
 
-@Pipeable
+@pipeable
 def Back(r):
     return r.back
 
-@Pipeable
+@pipeable
 def Length(r):
     return r.length
 
-@Pipeable
+@pipeable
 def Empty(r):
     return r.empty
 
-@Pipeable(rightToLeft=True, pipeOnly=True)
+@pipeable
 def PopFront(r):
     r.popFront()
     return r
 
-@Pipeable(rightToLeft=True, pipeOnly=True)
+@pipeable
 def PopBack(r):
     r.popBack()
     return r

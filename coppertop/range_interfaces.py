@@ -19,7 +19,7 @@
 
 from __future__ import annotations
 
-from coppertop import Pipeable
+from coppertop import pipeable
 from typing import Any, Union
 import sys
 
@@ -63,7 +63,7 @@ class IInputRange(object):
             self.r.popFront()
             return answer
 
-@Pipeable(leftToRight=True, pipeOnly=True)
+@pipeable(leftToRight=True, pipeOnly=True)
 def GetIRIter(r):
     # the name is deliberately semi-ugly to discourge but not prevent
     return r._GetIRIter

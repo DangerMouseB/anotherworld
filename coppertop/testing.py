@@ -17,15 +17,14 @@
 # *******************************************************************************
 
 
-from ._testing import HookStdOutErrToLines, AssertRaises
-from .pipeable import Pipeable
+from coppertop._pipe import pipeable
 
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
 
-@Pipeable
-def AssertEqual(actual, expected, suppressMsg=False, keepWS=False, returnResult=False, tolerance=_EPS):
+@pipeable
+def assertEqual(actual, expected, suppressMsg=False, keepWS=False, returnResult=False, tolerance=_EPS):
     if keepWS:
         act = actual
         exp = expected
@@ -33,7 +32,7 @@ def AssertEqual(actual, expected, suppressMsg=False, keepWS=False, returnResult=
         act = actual.replace(" ", "").replace("\n", "") if isinstance(actual, (str,)) else actual
         exp = expected.replace(" ", "").replace("\n", "") if isinstance(expected, (str,)) else expected
     if isinstance(act, (int, float)) and isinstance(exp, (int, float)):
-        equal = act >> CloseTo(tolerance=tolerance) >> exp
+        equal = act >> closeTo(tolerance=tolerance) >> exp
     else:
         equal = act == exp
     if returnResult:
@@ -52,8 +51,8 @@ def AssertEqual(actual, expected, suppressMsg=False, keepWS=False, returnResult=
             return None
 
 
-@Pipeable
-def CloseTo(a, b, tolerance=_EPS):
+@pipeable
+def closeTo(a, b, tolerance=_EPS):
     if abs(a) < tolerance:
         return abs(b) < tolerance
     else:

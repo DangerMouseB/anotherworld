@@ -17,42 +17,49 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
-from ..ranges import RMap
+
+from coppertop._pipe import pipeable
+# from ..ranges import RMap
 
 
-@Pipeable
-def Sorted(iterable, key=None, reverse=False):
-    return sorted(iterable, key, reverse)
+@pipeable
+def sort(x, key=None, reverse=False):
+    if isinstance(x, dict):
+        return dict(sorted(x.items(), key=key, reverse=reverse))
+    else:
+        return sorted(x, key=key, reverse=reverse)
 
-@Pipeable
-def Len(lenable):
-    return len(lenable)
 
-@Pipeable
+@pipeable
+def count(iter):
+    return len(iter)
+
+@pipeable
 def WrapInList(x):
     l = []
     l.append(x)
     return l
 
-@Pipeable
+@pipeable
 def First(x):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def Last(x):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def Take(x):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def Cut(x):
     raise NotImplementedError()
 
-@Pipeable
+@pipeable
 def ReplaceWith(haystack, needle, replacement):
     return haystack >> RMap >> (lambda e: replacement if e == needle else e)
 

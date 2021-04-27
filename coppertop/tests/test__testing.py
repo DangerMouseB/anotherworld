@@ -18,7 +18,7 @@
 
 
 
-from .._testing import HookStdOutErrToLines, AssertRaises
+from .._testing import HookStdOutErrToLines, assertRaises
 
 
 def testStdoutHooker():
@@ -40,18 +40,18 @@ def testStdoutHooker():
 def testAssertRaises():
     
     # test correct error
-    with AssertRaises(NotImplementedError) as e:
+    with assertRaises(NotImplementedError) as e:
         raise NotImplementedError()
     assert e.exceptionType == NotImplementedError, (e.type, e.e)
     
     # test correct error
-    with AssertRaises(NotImplementedError) as e:
+    with assertRaises(NotImplementedError) as e:
         raise NotImplementedError
     assert e.exceptionType == NotImplementedError, (e.type, e.e)
     
     # test no error
     try:
-        with AssertRaises(NotImplementedError) as e:
+        with assertRaises(NotImplementedError) as e:
             pass
     except AssertionError:
         assert e.exceptionType == None, (e.type, e.e)
@@ -61,7 +61,7 @@ def testAssertRaises():
     # test wrong error
     class Fred(Exception): pass
     try:
-        with AssertRaises(NotImplementedError) as e:
+        with assertRaises(NotImplementedError) as e:
             raise Fred
     except AssertionError:
         assert e.exceptionType == Fred, (e.exceptionType, e.e)

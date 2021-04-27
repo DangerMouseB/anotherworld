@@ -17,7 +17,7 @@
 # *******************************************************************************
 
 
-from ..pipeable import Pipeable
+from coppertop._pipe import pipeable
 
 
 
@@ -102,7 +102,7 @@ _IanaCityByFpMLCity= dict(
     USDC = IanaCity.America_New_York,
     USNY = IanaCity.America_New_York
 )
-@Pipeable
+@pipeable
 def ToIanaCity(fpmlCity):
     return _IanaCityByFpMLCity[fpmlCity]
 

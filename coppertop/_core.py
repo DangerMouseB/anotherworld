@@ -1,6 +1,6 @@
 # *******************************************************************************
 #
-#    Copyright (c) 2011-2019 David Briant
+#    Copyright (c) 2011-2021 David Briant
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -40,3 +40,6 @@ if not hasattr(sys, '_NULL'):
     sys._NULL = _NULL()
 Null = sys._NULL
 
+class ProgrammerError(Exception): pass
+class NotYetImplemented(Exception): pass
+class PathNotTested(Exception): pass

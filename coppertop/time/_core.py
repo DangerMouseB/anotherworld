@@ -79,8 +79,8 @@ import math
 from _strptime import _strptime
 from collections import namedtuple
 
-from ..pipeable import Pipeable, Missing
-from ._enums import ObserversCtx, FpMLCity, IanaCity, IanaTz, Precision, FpMLCityForName, IanaCityForName, IanaTzForName, ToIanaCity
+from coppertop._pipe import pipeable, Missing
+from ._enums import ObserversCtx, FpMLCity, IanaCity, IanaTz, Precision, FpMLCityForName, IanaCityForName, IanaTzForName
 
 _YMDHMSSPZ = namedtuple('_YMDHMSSPZ', ['y', 'M', 'd', 'h', 'm', 's', 'ss', 'p', 'z'])
 
@@ -319,7 +319,7 @@ MM_DD_YY = 5
 MM_DD_YYYY = 6
 # etc tbc
 
-@Pipeable
+@pipeable
 def ParseAbstractDate(format, s, locale=Missing):
     if isinstance(format, int):
 
@@ -352,42 +352,42 @@ def ParseAbstractDate(format, s, locale=Missing):
         assert args[-1] == None
         return AbstractDate(*args[0:3])
 
-@Pipeable
+@pipeable
 def ParseAbstractTimeOfDay(format, s, locale=Missing):
     pass
 
-@Pipeable
+@pipeable
 def ParseAbstractDateTime(format, s, locale=Missing):
     args = _parseDTTz(s, format)
     assert args[-1] == None
     return AbstractDateTime(*args[0:8])
 
-@Pipeable
+@pipeable
 def ParseObservedTimeOfDay(format, s, locale=Missing):
     pass
 
-@Pipeable
+@pipeable
 def ParseObservedDateTime(format, s, locale=Missing):
     # "2020.01.01 16:15 GBLN" >> ToDateTimeTz
     pass
 
-@Pipeable
+@pipeable
 def ParseObserversCtx(format, s, locale=Missing):
     pass
 
-@Pipeable
+@pipeable
 def ParseFpMLCity(s, locale=Missing):
     return FpMLCityForName(s)
 
-@Pipeable
+@pipeable
 def ParseIanaCity(s, locale=Missing):
     return IanaCityForName(s)
 
-@Pipeable
+@pipeable
 def ParseIanaTz(s, locale=Missing):
     return IanaTzForName(s)
 
-@Pipeable
+@pipeable
 def ParseOffsetTz(s, locale=Missing):
     pass
 
@@ -422,7 +422,7 @@ def ToString(format, otd, locale=Missing):
 def ToString(format, oc, locale=Missing):
     return repr(oc)
 
-ToString = Pipeable(ToString)
+ToString = pipeable(ToString)
 
 
 
@@ -463,22 +463,22 @@ def AsObserved(ctx, adt):
 # Precision Conversions
 # *******************************************************************************
 
-@Pipeable
+@pipeable
 def AsOfSecond(x):
     assert isinstance(x, (AbstractTimeOfDay, AbstractDateTime, ObservedTimeOfDay, ObservedDateTime))
     raise NotImplementedError
 
-@Pipeable
+@pipeable
 def AsOfMilli(x):
     assert isinstance(x, (AbstractTimeOfDay, AbstractDateTime, ObservedTimeOfDay, ObservedDateTime))
     raise NotImplementedError
 
-@Pipeable
+@pipeable
 def AsOfMicro(x):
     assert isinstance(x, (AbstractTimeOfDay, AbstractDateTime, ObservedTimeOfDay, ObservedDateTime))
     raise NotImplementedError
 
-@Pipeable
+@pipeable
 def AsOfNano(x):
     assert isinstance(x, (AbstractTimeOfDay, AbstractDateTime, ObservedTimeOfDay, ObservedDateTime))
     raise NotImplementedError
@@ -496,15 +496,15 @@ class DaySecond(object):
         # days, seconds
         # days, seconds, subseconds, precision
 
-# @Pipeable(ds=DaySecond, utc=ObservedDateTime)
-@Pipeable
+# @pipeable(ds=DaySecond, utc=ObservedDateTime)
+@pipeable
 def AddPeriod(ds, utc):
     # typical usage aDate >> AddPeriod(dt)
     assert utc.ctx == IanaTz.UTC
     pyDT = utc._datetime + _timedelta(ds.days, ds.second, ds.milli )
     return ObservedDateTime(pyDT.year, pyDT.month, pyDT.day)
 
-@Pipeable
+@pipeable
 def AddPeriod(ds, ad):
     # typical usage anAbstractDate >> AddPeriod(dt)
     pyDT = ad + _timedelta(ds.days)

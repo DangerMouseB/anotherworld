@@ -17,46 +17,50 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from coppertop.pipeable import Pipeable
+
+from coppertop._pipe import pipeable
+import builtins
 
 
 # conversions
 
-@Pipeable
+@pipeable
 def ToStr(x):
     return str(x)
 
-@Pipeable
+@pipeable
 def ToInt(a):
     return int(a)
 
-@Pipeable
+@pipeable
 def ToRepr(x):
     return str(x)
 
-@Pipeable
+@pipeable
 def ToString(format, x):
     raise NotImplementedError('ToString')
 
 
 # other
 
-@Pipeable
+@pipeable
 def Not(x):
     return not x
 
-@Pipeable
-def GetAttr(x, name):
+@pipeable
+def getAttr(x, name):
     return getattr(x, name)
 
-@Pipeable
-def Max(x):
-    return max(x)
+@pipeable
+def max(iter):
+    return builtins.max(iter)
 
-@Pipeable
-def Min(x):
-    return min(x)
+@pipeable
+def min(iter):
+    return builtins.min(iter)
 
 
 

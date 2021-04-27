@@ -28,12 +28,12 @@ from coppertop.time import AddPeriod, DaySecond, ParseAbstractDate, YYYY_MM_DD
 
 # utilities to help testing
 
-@Pipeable
+@pipeable
 def _IthDateBetween(start, end, i):
     ithDate = start >> time.AddPeriod(DaySecond(i))
     return FnAdapterFRange.Empty if ithDate > end else ithDate
 
-@Pipeable
+@pipeable
 def DatesBetween(start, end):
      return FnAdapterFRange((start, end) >> args >> _IthDateBetween)
 

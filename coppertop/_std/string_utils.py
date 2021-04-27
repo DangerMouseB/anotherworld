@@ -17,30 +17,33 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
 
-@Pipeable
+from coppertop._pipe import pipeable
+
+@pipeable
 def Strip(s,  chars=None):
     return s.strip(chars)
 
-@Pipeable
+@pipeable
 def LJust(w, s, pad=" "):
     return s.ljust(w, pad)
 
-@Pipeable
+@pipeable
 def RJust(w, s, pad=" "):
     return s.rjust(w, pad)
 
-@Pipeable
+@pipeable
 def CJust(w, s, pad=" "):
     return s.center(w, pad)
 
-@Pipeable
+@pipeable
 def JoinUsing(strings, sep):
     return sep.join(strings)
 
-@Pipeable
+@pipeable
 def Format(format, thing):
     return format.format(thing)
 

@@ -17,25 +17,29 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
 try:
     import numpy
 except:
     numpy = None
-from ..pipeable import Pipeable
+from coppertop._pipe import pipeable
 
 
 
-@Pipeable
+@pipeable
 def Mean(ndOrPy):
     # should do full numpy?
     return numpy.mean(ndOrPy)
 
-@Pipeable
+@pipeable
 def Std(ndOrPy, dof=0):
     # should do full numpy? std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=<no value>)
     return numpy.std(ndOrPy, dof)
 
-@Pipeable
+@pipeable
 def Sqrt(x):
     return numpy.sqrt(x)
 

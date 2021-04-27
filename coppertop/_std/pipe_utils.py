@@ -18,19 +18,22 @@
 # *******************************************************************************
 
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ..pipeable import Pipeable
+
+from coppertop._pipe import pipeable
 
 
 # Composition - could be made more efficient
 
-@Pipeable(overrideLHS=True)
+@pipeable(overrideLHS=True)
 def Compose(f1, f2):
-    @Pipeable
+    @pipeable
     def _Composed(x):
         return x >> f1 >> f2
     return _Composed
 
-@Pipeable(overrideLHS=True)
+@pipeable(overrideLHS=True)
 def ComposeAll(f1, f2):
     raise NotImplementedError()
