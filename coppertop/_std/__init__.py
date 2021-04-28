@@ -22,7 +22,9 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 from .iter_utils import *
+from .collections import *
 from .datetime_utils import *
+from .file_system import *
 from .list_utils import *
 from .math_utils import *
 from .misc import *

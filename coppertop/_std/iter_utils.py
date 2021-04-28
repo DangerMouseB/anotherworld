@@ -1,37 +1,33 @@
 # *******************************************************************************
 #
-#    Copyright (c) 2017-2020 David Briant
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+#    Copyright (c) 2017-2020 David Briant. All rights reserved.
 #
 # *******************************************************************************
-
 
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-from coppertop._pipe import pipeable, binary
+from .._pipe import pipeable, binary, ternary
 
 
 # iter iteration (rather than range iteration)
 
 @pipeable(flavour=binary)
 def each(xs, f):
-    """each(xs, f)  e.g. xs >> Each >> f
+    """each(xs, f)  e.g. xs >> each >> f
     Answers [f(x) for x in xs]"""
     return [f(x) for x in xs]
 
+@pipeable(flavour=binary)
+def filter(xs, f):
+    """each(xs, f)  e.g. xs >> filter >> f
+    Answers [x for x in xs if f(x)]"""
+    return [x for x in xs if f(x)]
+
+@pipeable(flavour=ternary)
+def eachBoth(xs, fn2, ys):
+    return [fn2(x, y) for (x, y) in zip(xs, ys)]
 
 # @pipeable
 # def EachIf(xs, f, ifF):

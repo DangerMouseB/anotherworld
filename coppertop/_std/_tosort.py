@@ -6,7 +6,7 @@
 
 
 import itertools, builtins
-from coppertop.fp import pipeable, binary, ternary
+from .._pipe import pipeable, binary
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
@@ -15,11 +15,6 @@ _EPS = 7.105427357601E-15      # i.e. double precision
 def copyTo(src, dest):
     pass
 
-
-
-@pipeable(flavour=ternary)
-def eachBoth(xs, fn2, ys):
-    return [fn2(x, y) for (x, y) in zip(xs, ys)]
 
 @pipeable(flavour=binary)
 def chunkUsing(iter, fn2):
@@ -38,27 +33,6 @@ def _pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
-
-
-
-@pipeable(flavour=binary)
-def merge(d1, d2):
-    answer = dict(d1)
-    answer.update(d2)
-    return answer
-
-@pipeable
-def replaceAll(xs, old, new):
-    assert isinstance(xs, tuple)
-    return (new if x == old else x for x in xs)
-
-@pipeable
-def indexesOf(xs, x):
-    answer = []
-    for i, e in enumerate(xs):
-        if x == e:
-            answer.append(i)
-    return answer
 
 @pipeable
 def within(x, a, b):
@@ -98,16 +72,3 @@ def closeTo(a, b, tolerance=_EPS):
         return abs(b) < tolerance
     else:
         return abs(a - b) / abs(a) < tolerance
-
-@pipeable
-def atPut(xs, iOrIs, yOrYs):
-    # immutable
-    if not isinstance(xs, list):
-        raise TypeError('xs must be a list')
-    xs = list(xs)
-    if isinstance(iOrIs, (list, tuple)):
-        for fromI, toI in enumerate(iOrIs):
-            xs[toI] = yOrYs[fromI]
-    else:
-        xs[iOrIs] = yOrYs
-    return xs
