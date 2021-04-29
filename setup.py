@@ -10,9 +10,9 @@ setup(
   name = 'coppertop',
   packages = [
     'coppertop',
-    'coppertop._std',
     'coppertop.examples',
     'coppertop.examples.tests',
+    'coppertop.std',
     'coppertop.tests',
     'coppertop.time',
     'coppertop.time.tests',

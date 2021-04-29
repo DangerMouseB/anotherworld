@@ -12,17 +12,6 @@ from .._pipe import pipeable
 # from ..ranges import RMap
 
 
-@pipeable
-def sort(x, key=None, reverse=False):
-    if isinstance(x, dict):
-        return dict(sorted(x.items(), key=key, reverse=reverse))
-    else:
-        return sorted(x, key=key, reverse=reverse)
-
-
-@pipeable
-def count(iter):
-    return len(iter)
 
 @pipeable
 def WrapInList(x):

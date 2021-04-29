@@ -11,12 +11,25 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 from .._pipe import pipeable, binary
 
 
+@pipeable
+def sort(x, key=None, reverse=False):
+    if isinstance(x, dict):
+        return dict(sorted(x.items(), key=key, reverse=reverse))
+    else:
+        return sorted(x, key=key, reverse=reverse)
+
+@pipeable
+def count(iter):
+    return len(iter)
+
 @pipeable(flavour=binary)
 def join(xs, ysOrSep):
-    if isinstance(ysOrSep, string):
-        return sep.join(xs)
-    elif isinstance(ysOrSep, (string, list)):
+    if isinstance(ysOrSep, str):
+        return ysOrSep.join(xs)
+    elif isinstance(ysOrSep, (tuple, list)):
         return xs + ysOrSep
+    else:
+        raise TypeError()
 
 @pipeable(flavour=binary)
 def merge(d1, d2):

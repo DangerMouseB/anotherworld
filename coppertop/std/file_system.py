@@ -10,6 +10,8 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 import os, os.path
 from .._pipe import pipeable, Pipeable, unary, binary
+from .string import strip
+from .iteration import each
 
 getCwd = os.getcwd
 isFile = Pipeable('isFile', unary, os.path.isfile)
@@ -23,3 +25,14 @@ def joinPath(a, b):
 @pipeable
 def readlines(f):
     return f.readlines()
+
+@pipeable
+def linesOf(pathfilename):
+    with open(pathfilename) as f:
+        return f >> readlines >> each >> strip(...,'\\n')
+
+@pipeable(flavour=binary)
+def copyTo(src, dest):
+    raise NotImplementedError()
+
+

@@ -20,17 +20,17 @@
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-
-from .iter_utils import *
+from ._tosort import *
 from .collections import *
 from .datetime_utils import *
 from .file_system import *
+from .iteration import *
 from .list_utils import *
-from .math_utils import *
+from .maths import *
 from .misc import *
 from .module_utils import *
-# from .pipe_utils import *
+from .pipe_utils import *
 from .range_utils import *
 from .repl_utils import *
 from .stdio import *
-from .string_utils import *
+from .string import *

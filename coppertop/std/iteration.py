@@ -29,12 +29,31 @@ def filter(xs, f):
 def eachBoth(xs, fn2, ys):
     return [fn2(x, y) for (x, y) in zip(xs, ys)]
 
-# @pipeable
-# def EachIf(xs, f, ifF):
-#     """each(xs, f)  e.g. xs >> EachIf >> f >> ifF
-#     Answers [f(x) for x in xs]"""
-#     return [f(x) for x in xs if ifF(x)]
-#
+@pipeable(flavour=binary)
+def inject(xs, seed, f2):
+    prior = seed
+    for x in xs:
+        prior = f2(prior, x)
+    return prior
+
+@pipeable(flavour=binary)
+def chunkUsing(iter, fn2):
+    answer = []
+    i0 = 0
+    for i1, (a, b) in enumerate(_pairwise(iter)):
+        if not fn2(a, b):
+            answer += [iter[i0:i1+1]]
+            i0 = i1 + 1
+    answer += [iter[i0:]]
+    return answer
+
+def _pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
 # @pipeable
 # def Chain(seed, xs, f):
 #     """chain(seed, xs, f)    e.g. xs >> Chain(seed) >> f

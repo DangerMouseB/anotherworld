@@ -7,39 +7,14 @@
 
 import itertools, builtins
 from .._pipe import pipeable, binary
+from .._core import Missing
+from .maths import closeTo
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
 
-@pipeable(flavour=binary)
-def copyTo(src, dest):
-    pass
-
 
 @pipeable(flavour=binary)
-def chunkUsing(iter, fn2):
-    answer = []
-    i0 = 0
-    for i1, (a, b) in enumerate(_pairwise(iter)):
-        if not fn2(a, b):
-            answer += [iter[i0:i1+1]]
-            i0 = i1 + 1
-    answer += [iter[i0:]]
-    return answer
-
-def _pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
-@pipeable
-def within(x, a, b):
-    # answers true if x is in the closed interval [a, b]
-    return (a <= x) and (x <= b)
-
-@pipeable
 def assertEquals(actual, expected, suppressMsg=False, keepWS=False, returnResult=False, tolerance=_EPS):
     if keepWS:
         act = actual
@@ -65,10 +40,3 @@ def assertEquals(actual, expected, suppressMsg=False, keepWS=False, returnResult
                 raise AssertionError('expected %s but got %s' % (expected, actual))
         else:
             return None
-
-@pipeable
-def closeTo(a, b, tolerance=_EPS):
-    if abs(a) < tolerance:
-        return abs(b) < tolerance
-    else:
-        return abs(a - b) / abs(a) < tolerance

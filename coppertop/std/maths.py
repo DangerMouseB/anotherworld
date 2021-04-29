@@ -7,6 +7,7 @@
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
+_EPS = 7.105427357601E-15      # i.e. double precision
 
 try:
     import numpy
@@ -15,6 +16,17 @@ except:
 from .._pipe import pipeable
 
 
+@pipeable
+def closeTo(a, b, tolerance=_EPS):
+    if abs(a) < tolerance:
+        return abs(b) < tolerance
+    else:
+        return abs(a - b) / abs(a) < tolerance
+
+@pipeable
+def within(x, a, b):
+    # answers true if x is in the closed interval [a, b]
+    return (a <= x) and (x <= b)
 
 @pipeable
 def Mean(ndOrPy):

@@ -67,15 +67,15 @@ except:
     pass
 
 try:
-    from . import _std
-    from coppertop._std import *
-    _all.update(_getPublicMembersOnly(_std))
+    from . import std
+    from coppertop.std import *
+    _all.update(_getPublicMembersOnly(std))
 except:
     pass
 
 # try:
-#     from ._std import stdio
-#     from coppertop._std.stdio import *
+#     from .d import stdio
+#     from coppertop.d.stdio import *
 #     _all.update(_getPublicMembersOnly(stdio))
 # except:
 #     pass

@@ -20,7 +20,7 @@
 import operator
 from ..testing import AssertEqual
 from coppertop._pipe import pipeable
-from coppertop._std import Chain, Each, EachArgs
+from coppertop.std import Chain, Each, EachArgs
 
 def test_stuff():
     2 >> AssertEqual >> 2
