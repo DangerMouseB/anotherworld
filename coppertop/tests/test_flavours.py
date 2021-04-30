@@ -135,23 +135,23 @@ def testTernary():
 
 
 
-def testExamples():
-    join = MultiFunction('join', Binary)
-    mul = MultiFunction('mul', Binary)
-    add = MultiFunction('add', Binary)
-    fred = MultiFunction('fred', Unary)
-    eachBoth = MultiFunction('eachBoth', Ternary)
-    each = MultiFunction('each', Binary)
-    inject = MultiFunction('inject', Binary)
-
-    str([1, 2] >> each >> fred) >> assertEquals >> 'each([1, 2], fred)'
-    str([1, 2] >> join >> mul >> fred) >> assertEquals >> 'fred(join([1, 2], mul))'
-    str([1, 2] >> inject(..., 0, ...) >> add) >> assertEquals >> 'inject([1, 2], 0, add)'
-    str([1, 2] >> eachBoth >> mul >> [2, 4] >> fred) >> assertEquals >> 'fred(eachBoth([1, 2], mul, [2, 4]))'
-
-    with assertRaises(SyntaxError) as e:
-        [1, 2] >> each(..., fred)
-    e.exceptionValue.args[0] >> assertEquals >> 'needs 1 args but 2 will be piped'
+# def testExamples():
+#     join = MultiFunction('join', Binary)
+#     mul = MultiFunction('mul', Binary)
+#     add = MultiFunction('add', Binary)
+#     fred = MultiFunction('fred', Unary)
+#     eachBoth = MultiFunction('eachBoth', Ternary)
+#     each = MultiFunction('each', Binary)
+#     inject = MultiFunction('inject', Binary)
+#
+#     str([1, 2] >> each >> fred) >> assertEquals >> 'each([1, 2], fred)'
+#     str([1, 2] >> join >> mul >> fred) >> assertEquals >> 'fred(join([1, 2], mul))'
+#     str([1, 2] >> inject(..., 0, ...) >> add) >> assertEquals >> 'inject([1, 2], 0, add)'
+#     str([1, 2] >> eachBoth >> mul >> [2, 4] >> fred) >> assertEquals >> 'fred(eachBoth([1, 2], mul, [2, 4]))'
+#
+#     with assertRaises(SyntaxError) as e:
+#         [1, 2] >> each(..., fred)
+#     e.exceptionValue.args[0] >> assertEquals >> 'needs 1 args but 2 will be piped'
 
 
 

@@ -60,36 +60,36 @@ def main():
 def test_allDaysInYear():
     actual = []
     o = 2020 >> DatesInYear >> PushInto >> ListOR(actual)
-    actual[0] >> AssertEqual >> time.AbstractDate(2020, 1, 1)
-    actual[-1] >> AssertEqual >> time.AbstractDate(2020, 12, 31)
-    [e for e in 2020 >> DatesInYear >> GetIRIter] >> Len >> AssertEqual >> 366
+    actual[0] >> assertEquals >> time.AbstractDate(2020, 1, 1)
+    actual[-1] >> assertEquals >> time.AbstractDate(2020, 12, 31)
+    [e for e in 2020 >> DatesInYear >> GetIRIter] >> Len >> assertEquals >> 366
 
 
 def test_datesBetween():
     ('2020.01.16' >> ParseAbstractDate(YYYY_MM_DD)) >> DatesBetween >> ('2020.01.29' >> ParseAbstractDate(YYYY_MM_DD)) \
     >> RMap >> Day \
-    >> Materialise >> AssertEqual >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    >> Materialise >> assertEquals >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 
 
 def test_chunkingIntoMonths():
     2020 >> DatesInYear \
         >> MonthChunks \
         >> Materialise \
-        >> Len >> AssertEqual >> 12
+        >> Len >> assertEquals >> 12
 
 
 def test_checkNumberOfDaysInEachMonth():
     2020 >> DatesInYear \
         >> MonthChunks \
         >> Materialise >> Each >> Len \
-        >> AssertEqual >> [31,29,31,30,31,30,31,31,30,31,30,31]
+        >> assertEquals >> [31,29,31,30,31,30,31,31,30,31,30,31]
 
 
 def test__UntilWeekdayName():
     r = 2020 >> DatesInYear
     dates = [d for d in r >> _UntilWeekdayName(weekdayName='Sun') >> GetIRIter]
-    dates[-1] >> AssertEqual >> time.AbstractDate(2020, 1, 5)   # the sunday
-    r >> Front >> AssertEqual >> time.AbstractDate(2020, 1, 6) # the monday
+    dates[-1] >> assertEquals >> time.AbstractDate(2020, 1, 5)   # the sunday
+    r >> Front >> assertEquals >> time.AbstractDate(2020, 1, 6) # the monday
 
 
 def test_WeekChunks():
@@ -100,7 +100,7 @@ def test_WeekChunks():
         weekR = weeksR.front
         actual.append([d >> Day for d in weekR >> GetIRIter])
         weeksR.popFront()
-    actual >> AssertEqual >> [[16, 17, 18, 19], [20, 21, 22, 23, 24, 25, 26], [27, 28, 29]]
+    actual >> assertEquals >> [[16, 17, 18, 19], [20, 21, 22, 23, 24, 25, 26], [27, 28, 29]]
 
 
 def test_WeekStrings():
@@ -119,16 +119,16 @@ def test_WeekStrings():
         >> WeekStrings
     )
     weekStringsR2 = weekStringsR.save()
-    [ws for ws in weekStringsR >> GetIRIter] >> AssertEqual >> expectedJan2020
+    [ws for ws in weekStringsR >> GetIRIter] >> assertEquals >> expectedJan2020
 
     actual = [ws for ws in weekStringsR2 >> GetIRIter]
-    if actual >> AssertEqual(returnResult=True) >> expectedJan2020 >> Not: "fix WeekStrings.save()" >> PP
+    if actual >> assertEquals(returnResult=True) >> expectedJan2020 >> Not: "fix WeekStrings.save()" >> PP
 
 
 def test_MonthTitle():
     1 >> MonthTitle(..., 21) >> WrapInList >> IndexableFR \
         >> RMap >> Strip >> Materialise \
-        >> AssertEqual \
+        >> assertEquals \
         >> ['January']
 
 
@@ -141,10 +141,10 @@ def test_oneMonthsOutput():
             >> WeekChunks
             >> WeekStrings
     ] >> ChainAsSingleRange \
-        >> Materialise >> AssertEqual >> Jan2020TitleAndDateLines
+        >> Materialise >> assertEquals >> Jan2020TitleAndDateLines
 
     # equivalently
-    AssertEqual(
+    assertEquals(
         Materialise(MonthLines(Front(MonthChunks(DatesInYear(2020))))),
         Jan2020TitleAndDateLines
     )
