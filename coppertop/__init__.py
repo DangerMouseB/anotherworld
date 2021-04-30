@@ -18,7 +18,7 @@
 
 
 import sys
-sys._ImportTrace = True
+# sys._ImportTrace = True
 
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
@@ -61,7 +61,7 @@ except:
     pass
 
 try:
-    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary
+    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1
     _all.update(_getPublicMembersOnly(_pipe))
 except:
     pass

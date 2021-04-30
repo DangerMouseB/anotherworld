@@ -22,46 +22,46 @@ DeferredArg = _DeferredArg()
 
 
 class Pipeable(object):
-    def __init__(mf, name, flavour, fn):
-        mf.name = name
-        mf.flavour = flavour
-        mf.fn = fn
+    def __init__(p, name, flavour, fn):
+        p.name = name
+        p.flavour = flavour
+        p.fn = fn
 
-    def __call__(mf, *args, **kwargs):
-        return mf.flavour(mf, False, args >> substituteEllipses, kwargs)
+    def __call__(p, *args, **kwargs):
+        return p.flavour(p, False, args >> substituteEllipses, kwargs)
 
-    def __rrshift__(mf, arg):  # arg >> mf
-        if mf.flavour.numLeft == 0:
-            raise SyntaxError(f'arg >> {mf.name} - illegal syntax for a {mf.flavour.name}')
+    def __rrshift__(p, arg):  # arg >> p
+        if p.flavour.numLeft == 0:
+            raise SyntaxError(f'arg >> {p.name} - illegal syntax for a {p.flavour.name}')
         else:
-            args = [DeferredArg] * mf.flavour.numPiped
-            df = mf.flavour(mf, False, args, {})
+            args = [DeferredArg] * p.flavour.numPiped
+            df = p.flavour(p, False, args, {})
             return df.__rrshift__(arg)
 
-    def __rshift__(mf, arg):  # mf >> arg
-        if mf.flavour.numRight == 0:
-            raise SyntaxError(f'{mf.name} >> arg - illegal syntax for a {mf.flavour.name}')
+    def __rshift__(p, arg):  # p >> arg
+        if p.flavour.numRight == 0:
+            raise SyntaxError(f'{p.name} >> arg - illegal syntax for a {p.flavour.name}')
         else:
-            args = [DeferredArg] * mf.flavour.numRight
-            df = mf.flavour(mf, False, args, {})
+            args = [DeferredArg] * p.flavour.numRight
+            df = p.flavour(p, False, args, {})
             return df.__rshift__(arg)
 
-    def __repr__(mf):
-        return mf.name
+    def __repr__(p):
+        return p.name
 
-    def dispatch(mf, args, kwargs):
-        return mf.fn(*args, **kwargs)
+    def dispatch(p, args, kwargs):
+        return p.fn(*args, **kwargs)
 
 
 class PartialCall(object):
 
-    def __new__(cls, mf, isPiping, args, kwargs):
+    def __new__(cls, p, isPiping, args, kwargs):
         syntaxErrIf(count(args) < cls.numPiped, f'needs at least {cls.numPiped} arg' + pluraliseIf(cls.numPiped > 1))
         if not (iDefArgs := args >> indexesOf(_, DeferredArg)):
-            return mf.dispatch(args, kwargs)
+            return p.dispatch(args, kwargs)
         else:
             df = super().__new__(cls)
-            df.mf = mf
+            df.p = p
             df.args = args
             df.kwargs = kwargs
             df.iDefArgs = iDefArgs
@@ -73,7 +73,7 @@ class PartialCall(object):
         syntaxErrIf(count(args) > count(df.iDefArgs), f'too many args - got {count(args)} needed {count(df.iDefArgs)}')
         newArgs = df.args >> atPut(_, df.iDefArgs[0:count(args)], args >> substituteEllipses)
         newKwargs = merge(df.kwargs, kwargs)
-        return df.__class__(df.mf, df.isPiping, newArgs, newKwargs)
+        return df.__class__(df.p, df.isPiping, newArgs, newKwargs)
 
     def __rrshift__(df, arg):  # arg >> df
         if df.numLeft == 0:
@@ -84,7 +84,7 @@ class PartialCall(object):
             syntaxErrIf(count(df.iDefArgs) != df.numPiped,
                          f'needs {count(df.iDefArgs)} args but {df.numPiped} will be piped')
             newArgs = df.args >> atPut(_, df.iDefArgs, [arg] + [DeferredArg] * (df.numPiped - 1))
-            return df.__class__(df.mf, True, newArgs, df.kwargs)
+            return df.__class__(df.p, True, newArgs, df.kwargs)
 
     def __rshift__(df, arg):  # df >> arg
         if df.numRight == 0:
@@ -112,10 +112,10 @@ class PartialCall(object):
                     raise ProgrammerError()
             else:
                 raise ProgrammerError()
-            return df.__class__(df.mf, True, newArgs, df.kwargs)
+            return df.__class__(df.p, True, newArgs, df.kwargs)
 
     def __repr__(df):
-        return f"{df.mf.name}({', '.join([repr(arg) for arg in df.args])})"
+        return f"{df.p.name}({', '.join([repr(arg) for arg in df.args])})"
 
 
 class nullary(PartialCall):
@@ -151,6 +151,13 @@ class ternary(PartialCall):
     numPiped = 3
     numLeft = 1
     numRight = 2
+
+class unary1(Pipeable):
+    names = 'unary1'
+    def __call__(p, *args, **kwargs):
+        return p.fn(*args, **kwargs)
+    def __rrshift__(p, arg):  # arg >> p
+        return p.fn(arg)
 
 
 def prettyForm(flavour):
@@ -218,14 +225,17 @@ def pipeable(*args, flavour=unary):
             if s[i][_I_FUNCTION] == '<module>':
                 iModule = i
                 break
-        if iModule == -1:
-            raise SyntaxError('Can\'t find module within 2 levels')
+        # if iModule == -1:
+        #     raise SyntaxError('Can\'t find module within 2 levels')
         # module = inspect.getmodule(s[iModule][_I_FRAME])
         # moduleName = inspect.getmodulename(s[iModule][_I_FILENAME])
         # packageName = module.__package__
         #myFullModuleName = packageName + '.' + moduleName + '.' + _name
 
-        mf = Pipeable(_name, flavour, fn)
+        if issubclass(flavour, Pipeable):
+            mf = flavour(_name, flavour, fn)
+        else:
+            mf = Pipeable(_name, flavour, fn)
         return mf
 
     if len(args) == 1 and isinstance(args[0], (types.FunctionType, types.MethodType, type)):
@@ -243,6 +253,15 @@ def pipeable(*args, flavour=unary):
 
 
 # the following is just so I can use >> above - if the above is ever slow normal python functions can be used instead
+
+class _Unary1Fn(object):
+    def __init__(unary, fn, numArgs):
+        unary.fn = fn
+        unary.numArgs = numArgs
+    def __call__(unary, *args, **kwargs):
+        return unary.fn(*args, **kwargs)
+    def __rrshift__(unary, arg):
+        return unary.fn(arg)
 
 class _UnaryFn(object):
     def __init__(unary, fn, numArgs):
@@ -309,5 +328,5 @@ atPut = _UnaryFn(atPut, 3)
 
 def substituteEllipses(xs):
     return tuple(DeferredArg if x is ... else x for x in xs)
-substituteEllipses = _UnaryFn(substituteEllipses, 1)
+substituteEllipses = _Unary1Fn(substituteEllipses, 1)
 
