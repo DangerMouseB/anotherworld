@@ -29,17 +29,17 @@ def within(x, a, b):
     return (a <= x) and (x <= b)
 
 @pipeable
-def Mean(ndOrPy):
+def mean(ndOrPy):
     # should do full numpy?
     return numpy.mean(ndOrPy)
 
 @pipeable
-def Std(ndOrPy, dof=0):
+def std(ndOrPy, dof=0):
     # should do full numpy? std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=<no value>)
     return numpy.std(ndOrPy, dof)
 
 @pipeable
-def Sqrt(x):
+def sqrt(x):
     return numpy.sqrt(x)
 
 
