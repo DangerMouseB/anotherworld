@@ -18,7 +18,7 @@ setup(
     'coppertop.time.tests',
   ],
   python_requires='>=3.6',
-  version = 'v0.2.1',
+  version = 'v0.2.2',
   license='bsd',
   description = 'Some batteries Python didn\'t come with - a pipe operator, d language style ranges, and more',
   long_description_content_type='text/markdown',
