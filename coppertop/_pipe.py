@@ -152,12 +152,27 @@ class ternary(PartialCall):
     numLeft = 1
     numRight = 2
 
+
 class unary1(Pipeable):
     names = 'unary1'
     def __call__(p, *args, **kwargs):
         return p.fn(*args, **kwargs)
     def __rrshift__(p, arg):  # arg >> p
         return p.fn(arg)
+
+
+class binary2(Pipeable):
+    names = 'binary2'
+    def __call__(b2, *args, **kwargs):
+        return b2.fn(*args, **kwargs)
+    def __rrshift__(b2, arg1):  # arg1 >> b2
+        return partialBinary2(b2.fn, arg1)
+class partialBinary2(object):
+    def __init__(pb2, fn, arg1):
+        pb2.fn = fn
+        pb2.arg1 = arg1
+    def __rshift__(pb2, arg2):  # b2 >> arg2
+        return pb2.fn(pb2.arg1, arg2)
 
 
 def prettyForm(flavour):

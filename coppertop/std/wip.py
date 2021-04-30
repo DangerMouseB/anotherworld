@@ -1,21 +1,14 @@
 # *******************************************************************************
 #
-#    Copyright (c) 2020-2021 David Briant. All rights reserved.
+#    Copyright (c) 2021 David Briant. All rights reserved.
 #
 # *******************************************************************************
 
 
-import itertools, builtins
-from .._pipe import pipeable, binary
-from .._core import Missing
+from .._pipe import pipeable, unary1
 
 
-
-
-
-@pipeable
+@pipeable(flavour=unary1)
 def Not(b):
     return False if b else True
-
-
 

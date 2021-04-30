@@ -5,9 +5,7 @@
 # *******************************************************************************
 
 
-import itertools, builtins
 from .._pipe import pipeable, binary
-from .._core import Missing
 from .maths import closeTo
 
 _EPS = 7.105427357601E-15      # i.e. double precision

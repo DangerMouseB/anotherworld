@@ -61,7 +61,7 @@ except:
     pass
 
 try:
-    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1
+    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1, binary2
     _all.update(_getPublicMembersOnly(_pipe))
 except:
     pass

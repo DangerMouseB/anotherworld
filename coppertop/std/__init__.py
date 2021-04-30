@@ -20,7 +20,6 @@
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-from ._tosort import *
 from .collections import *
 from .datetime_utils import *
 from .file_system import *
@@ -34,3 +33,8 @@ from .range_utils import *
 from .repl_utils import *
 from .stdio import *
 from .string import *
+from .struct import *
+from .testing import *
+from .wip import *
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)

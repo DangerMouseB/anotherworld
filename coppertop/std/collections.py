@@ -8,7 +8,9 @@ import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-from .._pipe import pipeable, binary
+from .._pipe import pipeable, binary, binary2
+from .struct import struct
+from ._core import assertType
 
 
 @pipeable
@@ -22,7 +24,7 @@ def sort(x, key=None, reverse=False):
 def count(iter):
     return len(iter)
 
-@pipeable(flavour=binary)
+@pipeable(flavour=binary2)
 def join(xs, ysOrSep):
     if isinstance(ysOrSep, str):
         return ysOrSep.join(xs)
@@ -31,10 +33,22 @@ def join(xs, ysOrSep):
     else:
         raise TypeError()
 
-@pipeable(flavour=binary)
-def merge(d1, d2):
-    answer = dict(d1)
-    answer.update(d2)
+@pipeable(flavour=binary2)
+def merge(a, b):
+    assertType(a, (struct, dict))
+    assertType(b, (struct, dict))
+    if isinstance(a, struct):
+        answer = struct(a)
+        if isinstance(b, struct):
+            answer._update(b._fvPairs())
+        else:
+            answer._update(b)
+    else:
+        answer = dict(a)
+        if isinstance(b, struct):
+            answer.update(b._fvPairs())
+        else:
+            answer.update(b)
     return answer
 
 @pipeable
@@ -62,4 +76,40 @@ def atPut(xs, iOrIs, yOrYs):
     else:
         xs[iOrIs] = yOrYs
     return xs
+
+@pipeable(flavour=binary2)
+def intersects(a, b):
+    if not isinstance(a, (list, tuple)):
+        if not isinstance(b, (list, tuple)):
+            return a == b
+        else:
+            return a in b
+    else:
+        if not isinstance(b, (list, tuple)):
+            return b in a
+        else:
+            for e in a:
+                if e in b:
+                    return True
+            return False
+
+@pipeable(flavour=binary2)
+def subsetOf(a, b):
+    if not isinstance(a, (list, tuple)):
+        if not isinstance(b, (list, tuple)):
+            # 1, 1
+            return a == b
+        else:
+            # 1, 1+
+            return a in b
+    else:
+        if not isinstance(b, (list, tuple)):
+            # 1+, 1
+            return False
+        else:
+            # 1+, 1+
+            for e in a:
+                if e not in b:
+                    return False
+            return True
 
