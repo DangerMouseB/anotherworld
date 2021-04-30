@@ -24,7 +24,7 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 
-_all = set(['Missing', 'Null', 'getMyPublicMembers', 'getPublicMembersOf'])
+_all = set(['Missing', 'Null', 'getMyPublicMembers', 'getPublicMembersOf', '_'])
 
 import inspect
 
@@ -61,7 +61,7 @@ except:
     pass
 
 try:
-    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1, binary2
+    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1, binary2, _
     _all.update(_getPublicMembersOnly(_pipe))
 except:
     pass
