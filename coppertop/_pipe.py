@@ -10,8 +10,6 @@ import inspect, types
 from ._core import ProgrammerError, NotYetImplemented
 
 
-_ = ...
-
 
 class _DeferredArg():
     def __repr__(self):
@@ -72,7 +70,7 @@ class PartialCall(object):
         syntaxErrIf(df.isPiping, f'syntax not of form {prettyForm(df.__class__)}')
         syntaxErrIf(count(args) > count(df.iDefArgs), f'too many args - got {count(args)} needed {count(df.iDefArgs)}')
         newArgs = df.args >> atPut(_, df.iDefArgs[0:count(args)], args >> substituteEllipses)
-        newKwargs = merge(df.kwargs, kwargs)
+        newKwargs = override(df.kwargs, kwargs)
         return df.__class__(df.p, df.isPiping, newArgs, newKwargs)
 
     def __rrshift__(df, arg):  # arg >> df
@@ -309,11 +307,11 @@ class _DeferredUF(object):
         df.args[df.iArg] = arg
         return df.uf.fn(*df.args, **df.kwargs)
 
-def merge(d1, d2):
+def override(d1, d2):
     answer = dict(d1)
     answer.update(d2)
     return answer
-merge = _UnaryFn(merge, 2)
+override = _UnaryFn(override, 2)
 
 def count(lenable):
     return len(lenable)

@@ -37,4 +37,6 @@ from .struct import *
 from .testing import *
 from .wip import *
 
+_ = ...
+
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)

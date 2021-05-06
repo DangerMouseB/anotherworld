@@ -4,6 +4,7 @@
 #
 # *******************************************************************************
 
+from typing import Iterable
 import numpy as np
 from .._core import Missing
 from .._pipe import unary1, pipeable
@@ -23,27 +24,45 @@ class struct(dict):
         else:
             raise TypeError('first argument must be a prototype struct - got ' + repr(_structOrDict))
         super().update(kwargs)
+    def __dir__(s) -> Iterable[str]:
+        answer = list(super().keys())
+        return answer
     def __getattribute__(s, field):
-        if field == '_fields':
-            return super().keys
-        if field == '_fvPairs':
-            return super().items
-        if field == '_values':
-            return super().values
-        if field == '_update':
-            return super().update
+        # print(field)
+        if field[0:2] == '__':
+            if field == '__class__':
+                return struct
+            raise AttributeError()
+        elif field[0:1] == "_":
+            if field == '_fields':
+                return super().keys
+            if field == '_fvPairs':
+                return super().items
+            if field == '_values':
+                return super().values
+            if field == '_update':
+                return super().update
+            if field == '_setdefault':
+                return super().setdefault
+            if field == '_get':
+                return super().get
+            return super().get(field[1:], Missing)
         else:
-            return super().get(field, Missing)
+            if field == 'items':
+                # for pycharm :(   - pycharm knows we are a subclass of dict so is inspecting us via items
+                # longer term we may return a BTStruct instead of struct in response to __class__
+                return {}.items
+            try:
+                return super().__getitem__(field)
+            except KeyError:
+                raise AttributeError(f"'struct' object has no attribute '{field}'")
     def __setattr__(s, field, value):
         return super().__setitem__(field, value)
     def __getitem__(s, fieldOrFields):
         if isinstance(fieldOrFields, (list, tuple)):
             fvs = {field: s[field] for field in fieldOrFields}
             return struct(fvs)
-        if fieldOrFields is ...:
-            return struct(s)   # make a copy so can be updated
-        else:
-            return super().get(fieldOrFields, Missing)
+        return super().__getitem__(fieldOrFields)
     def __repr__(s):
         itemStrings = (f"{str(k)}={repr(v)}" for k, v in super().items())
         rep = "{}({})".format(type(s).__name__, ", ".join(itemStrings))
@@ -59,7 +78,7 @@ def fields(x):
     if isinstance(x, struct):
         return x._fields()
     else:
-        raise x.keys()
+        return x.keys()
 
 @pipeable(flavour=unary1)
 def fvPairs(x):

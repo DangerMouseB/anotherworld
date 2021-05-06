@@ -35,20 +35,35 @@ def join(xs, ysOrSep):
 
 @pipeable(flavour=binary2)
 def merge(a, b):
-    assertType(a, (struct, dict))
+    assertType(a, dict)
     assertType(b, (struct, dict))
-    if isinstance(a, struct):
-        answer = struct(a)
-        if isinstance(b, struct):
-            answer._update(b._fvPairs())
-        else:
-            answer._update(b)
+    answer = dict(a)
+    if isinstance(b, struct):
+        answer.update(b._fvPairs())
     else:
-        answer = dict(a)
-        if isinstance(b, struct):
-            answer.update(b._fvPairs())
-        else:
-            answer.update(b)
+        answer.update(b)
+    return answer
+
+@pipeable(flavour=binary2)
+def override(a, b):
+    assertType(a, struct)
+    assertType(b, (struct, dict))
+    answer = struct(a)
+    if isinstance(b, struct):
+        answer._update(b._fvPairs())
+    else:
+        answer._update(b)
+    return answer
+
+@pipeable(flavour=binary2)
+def underride(a, b):
+    assertType(a, struct)
+    assertType(b, (struct, dict))
+    answer = struct(a)
+    for k, v in (b._fvPairs() if isinstance(b, struct) else b.items()):
+        if k not in answer:
+            answer[k] = v
+        # answer._setdefault(k, v)      # this doesn't respect insertion order!!
     return answer
 
 @pipeable
