@@ -55,65 +55,65 @@ class PartialCall(object):
 
     def __new__(cls, p, isPiping, args, kwargs):
         syntaxErrIf(count(args) < cls.numPiped, f'needs at least {cls.numPiped} arg' + pluraliseIf(cls.numPiped > 1))
-        if not (iDefArgs := args >> indexesOf(_, DeferredArg)):
+        if not (iDefArgs := args >> indexesOf(..., DeferredArg)):
             return p.dispatch(args, kwargs)
         else:
-            df = super().__new__(cls)
-            df.p = p
-            df.args = args
-            df.kwargs = kwargs
-            df.iDefArgs = iDefArgs
-            df.isPiping = isPiping
-            return df
+            pc = super().__new__(cls)
+            pc.p = p
+            pc.args = args
+            pc.kwargs = kwargs
+            pc.iDefArgs = iDefArgs
+            pc.isPiping = isPiping
+            return pc
 
-    def __call__(df, *args, **kwargs):
-        syntaxErrIf(df.isPiping, f'syntax not of form {prettyForm(df.__class__)}')
-        syntaxErrIf(count(args) > count(df.iDefArgs), f'too many args - got {count(args)} needed {count(df.iDefArgs)}')
-        newArgs = df.args >> atPut(_, df.iDefArgs[0:count(args)], args >> substituteEllipses)
-        newKwargs = override(df.kwargs, kwargs)
-        return df.__class__(df.p, df.isPiping, newArgs, newKwargs)
+    def __call__(pc, *args, **kwargs):
+        syntaxErrIf(pc.isPiping, f'syntax not of form {prettyForm(pc.__class__)}')
+        syntaxErrIf(count(args) > count(pc.iDefArgs), f'{pc.p.name} - too many args - got {count(args)} needed {count(pc.iDefArgs)}')
+        newArgs = pc.args >> atPut(..., pc.iDefArgs[0:count(args)], args >> substituteEllipses)
+        newKwargs = override(pc.kwargs, kwargs)
+        return pc.__class__(pc.p, pc.isPiping, newArgs, newKwargs)
 
-    def __rrshift__(df, arg):  # arg >> df
-        if df.numLeft == 0:
+    def __rrshift__(pc, arg):  # arg >> pc
+        if pc.numLeft == 0:
             # if we are here then the arg does not implement __rshift__ so this is a syntax error
-            syntaxErrIf(True, f'syntax not of form {prettyForm(df.__class__)}')
+            syntaxErrIf(True, f'syntax not of form {prettyForm(pc.__class__)}')
         else:
-            syntaxErrIf(df.isPiping, f'syntax not of form {prettyForm(df.__class__)}')
-            syntaxErrIf(count(df.iDefArgs) != df.numPiped,
-                         f'needs {count(df.iDefArgs)} args but {df.numPiped} will be piped')
-            newArgs = df.args >> atPut(_, df.iDefArgs, [arg] + [DeferredArg] * (df.numPiped - 1))
-            return df.__class__(df.p, True, newArgs, df.kwargs)
+            syntaxErrIf(pc.isPiping, f'syntax not of form {prettyForm(pc.__class__)}')
+            syntaxErrIf(count(pc.iDefArgs) != pc.numPiped,
+                         f'needs {count(pc.iDefArgs)} args but {pc.numPiped} will be piped')
+            newArgs = pc.args >> atPut(..., pc.iDefArgs, [arg] + [DeferredArg] * (pc.numPiped - 1))
+            return pc.__class__(pc.p, True, newArgs, pc.kwargs)
 
-    def __rshift__(df, arg):  # df >> arg
-        if df.numRight == 0:
+    def __rshift__(pc, arg):  # pc >> arg
+        if pc.numRight == 0:
             return NotImplemented
         else:
-            if isinstance(df, rau):
+            if isinstance(pc, rau):
                 if isinstance(arg, Pipeable):
                     if arg.flavour in (nullary, unary, binary, ternary):
                         raise TypeError(f'we don\'t  allow a rau to consume a unary, binary, adverb or binaryAdverb')
                     if arg.flavour == rau:
                         raise NotYetImplemented('could make sense...')
-                syntaxErrIf(count(df.iDefArgs) != df.numPiped,
-                             f'needs {count(df.iDefArgs)} args but {df.numPiped} will be piped')
-                newArgs = df.args >> atPut(_, df.iDefArgs[0], arg)
-            elif isinstance(df, binary):
-                syntaxErrIf(not df.isPiping, f'syntax not of form {prettyForm(df.__class__)}')
-                newArgs = df.args >> atPut(_, df.iDefArgs[0], arg)
-            elif isinstance(df, ternary):
-                syntaxErrIf(not df.isPiping, f'syntax not of form {prettyForm(df.__class__)}')
-                if count(df.iDefArgs) == 2:
-                    newArgs = df.args >> atPut(_, df.iDefArgs[0:2], [arg, DeferredArg])
-                elif count(df.iDefArgs) == 1:
-                    newArgs = df.args >> atPut(_, df.iDefArgs[0], arg)
+                syntaxErrIf(count(pc.iDefArgs) != pc.numPiped,
+                             f'needs {count(pc.iDefArgs)} args but {pc.numPiped} will be piped')
+                newArgs = pc.args >> atPut(..., pc.iDefArgs[0], arg)
+            elif isinstance(pc, binary):
+                syntaxErrIf(not pc.isPiping, f'syntax not of form {prettyForm(pc.__class__)}')
+                newArgs = pc.args >> atPut(..., pc.iDefArgs[0], arg)
+            elif isinstance(pc, ternary):
+                syntaxErrIf(not pc.isPiping, f'syntax not of form {prettyForm(pc.__class__)}')
+                if count(pc.iDefArgs) == 2:
+                    newArgs = pc.args >> atPut(..., pc.iDefArgs[0:2], [arg, DeferredArg])
+                elif count(pc.iDefArgs) == 1:
+                    newArgs = pc.args >> atPut(..., pc.iDefArgs[0], arg)
                 else:
                     raise ProgrammerError()
             else:
                 raise ProgrammerError()
-            return df.__class__(df.p, True, newArgs, df.kwargs)
+            return pc.__class__(pc.p, True, newArgs, pc.kwargs)
 
-    def __repr__(df):
-        return f"{df.p.name}({', '.join([repr(arg) for arg in df.args])})"
+    def __repr__(pc):
+        return f"{pc.p.name}({', '.join([repr(arg) for arg in pc.args])})"
 
 
 class nullary(PartialCall):

@@ -50,9 +50,17 @@ class assertRaises(object):
         self.exceptionType = exceptionType
         self.exceptionValue = exceptionValue
         self.tb = tb
-        if exceptionType is None: raise AssertionError("No exception raised, %s expected." % self.expectedExceptionType)        # no error was raised
-        if issubclass(exceptionType, self.expectedExceptionType):
-            return True               # the correct error was raised
-        # traceback.print_tb(tb)    Don't think this makes much sense
-        raise AssertionError("%s raised. %s expected." % (exceptionType, self.expectedExceptionType) )
+        if exceptionType is None:
+            # no exception was raised
+            raise AssertionError("No exception raised, %s expected." % self.expectedExceptionType)        # no error was raised
+        elif not issubclass(exceptionType, self.expectedExceptionType):
+            # the wrong exception was raised
+            # print the tb to make it easier to figure why the test is failing
+            traceback.print_tb(tb)
+            raise AssertionError("%s raised. %s expected." % (exceptionType, self.expectedExceptionType))
+        else:
+            # the correct error was raised
+            return True
+
+
 

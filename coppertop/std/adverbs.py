@@ -11,11 +11,8 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 import itertools
 import numpy as np
 
-from .._core import NotYetImplemented
-from .._pipe import pipeable, binary, ternary, binary2, unary1
+from .._pipe import pipeable, binary, ternary, binary2
 from .struct import struct, _nd, nd
-
-# iter iteration (rather than range iteration)
 
 
 @pipeable(flavour=ternary)
@@ -29,7 +26,6 @@ def both(a, f, b):
         return [f(x, y) for (x, y) in zip(a, b)]
 
 
-@pipeable(flavour=binary2)
 def each(xs, f):
     """each(xs, f)  e.g. xs >> each >> f
     Answers [f(x) for x in xs]"""
@@ -41,29 +37,21 @@ def each(xs, f):
             return nd(it.operands[len(inputsAndOutput)-1])
     else:
         return [f(x) for x in xs]
+each = binary2('each', binary, each)
 
 
-@pipeable(flavour=binary)
 def ieach(xs, f2):
     """each(xs, f)  e.g. xs >> each >> f
     Answers [f(i, x) for x in enumerate(xs)]"""
     return [f2(i, x) for (i, x) in enumerate(xs)]
+ieach = binary2('ieach', binary, ieach)
 
 
-def _where(s, bools):
-    assert isinstance(s, struct)
-    answer = struct(s)
-    for f, v in s._fvPairs():
-        answer[f] = nd(v.nd[bools.nd])
-    return answer
-where = binary2('where', binary2, _where)
-
-
-@pipeable(flavour=binary2)
 def filter(xs, f):
     """each(xs, f)  e.g. xs >> filter >> f
     Answers [x for x in xs if f(x)]"""
     return [x for x in xs if f(x)]
+filter = binary2('filter', binary, filter)
 
 
 @pipeable(flavour=binary)
@@ -74,7 +62,6 @@ def inject(xs, seed, f2):
     return prior
 
 
-@pipeable(flavour=binary2)
 def chunkUsing(iter, fn2):
     answer = []
     i0 = 0
@@ -84,6 +71,7 @@ def chunkUsing(iter, fn2):
             i0 = i1 + 1
     answer += [iter[i0:]]
     return answer
+chunkUsing = binary2('chunkUsing', binary, chunkUsing)
 
 
 def _pairwise(iterable):
@@ -93,27 +81,3 @@ def _pairwise(iterable):
     return zip(a, b)
 
 
-dict_keys = type({}.keys())
-@pipeable(flavour=unary1)
-def materialise(x):
-    if isinstance(x, dict_keys):
-        return list(x)
-    else:
-        raise NotYetImplemented()
-
-
-# @pipeable
-# def Chain(seed, xs, f):
-#     """chain(seed, xs, f)    e.g. xs >> Chain(seed) >> f
-#     Answers resultn where resulti=f(prior, xi) for each x in xs
-#     prior = resulti-1 or seed initially"""
-#     prior = seed
-#     for x in xs:
-#         prior = f(prior, x)
-#     return prior
-#
-# @pipeable
-# def EachArgs(listOfArgs, f):
-#     """eachArgs(f, listOfArgs)
-#     Answers [f(*args) for args in listOfArgs]"""
-#     return [f(*args) for args in listOfArgs]

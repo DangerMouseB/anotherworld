@@ -9,11 +9,16 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
+
+import builtins
+
+from .._core import Missing
+from .._pipe import pipeable
+
 try:
     import numpy
 except:
-    numpy = None
-from .._pipe import pipeable
+    numpy = Missing
 
 
 @pipeable
@@ -42,4 +47,10 @@ def std(ndOrPy, dof=0):
 def sqrt(x):
     return numpy.sqrt(x)
 
+@pipeable
+def max(iter):
+    return builtins.max(iter)
 
+@pipeable
+def min(iter):
+    return builtins.min(iter)

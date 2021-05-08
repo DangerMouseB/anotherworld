@@ -12,13 +12,15 @@ from ._core import assertType
 
 
 class struct(dict):
+    # mutable when using a regular python style
+    # may be later wrapped in an immutable accessor
     def __new__(cls, _structOrDict=Missing, **kwargs):
         return super().__new__(cls)
     def __init__(s, _structOrDict=Missing, **kwargs):
         if _structOrDict is Missing:
             pass
         elif isinstance(_structOrDict, struct):
-            super().update(_structOrDict._fvPairs())
+            super().update(_structOrDict._pairsForTreeCopy)
         elif isinstance(_structOrDict, dict):
             super().update(_structOrDict)
         else:
@@ -38,6 +40,19 @@ class struct(dict):
                 return super().keys
             if field == '_fvPairs':
                 return super().items
+            if field == '_pairsForTreeCopy':
+                # in collaboration with __new__ this will recursively answer a tree
+                # copy (deep copy breaking diamonds) of any structs but not other
+                # objects (which will be shared / aliased). will go into an infinite
+                # loop on cycles (which we don't and shouldn't allow but nonetheless
+                # we should raise an error for, i.e. need to detect them - tbd)
+                answer = {}
+                for k,v in super().items():
+                    if issubclass(v.__class__, struct):
+                        answer[k] = v.__class__(v)
+                    else:
+                        answer[k] = v
+                return answer
             if field == '_values':
                 return super().values
             if field == '_update':
@@ -58,6 +73,10 @@ class struct(dict):
                 raise AttributeError(f"'struct' object has no attribute '{field}'")
     def __setattr__(s, field, value):
         return super().__setitem__(field, value)
+    def __call__(s, **kwargs):
+        for field, value in kwargs.items():
+            super().__setitem__(field, value)
+        return s
     def __getitem__(s, fieldOrFields):
         if isinstance(fieldOrFields, (list, tuple)):
             fvs = {field: s[field] for field in fieldOrFields}

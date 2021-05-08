@@ -143,5 +143,5 @@ CRPP = _PipeablePrintSplitCR()
 
 
 @pipeable
-def Pipeables(arg):
+def pipeables(arg):
     return sorted([k for k, v in arg.items() if isinstance(v, (pipeable,))])

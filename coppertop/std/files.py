@@ -11,7 +11,7 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 import os, os.path
 from .._pipe import pipeable, Pipeable, unary, binary
 from .string import strip
-from .iteration import each
+from .adverbs import each
 
 getCwd = os.getcwd
 isFile = Pipeable('isFile', unary, os.path.isfile)
@@ -34,5 +34,4 @@ def linesOf(pathfilename):
 @pipeable(flavour=binary)
 def copyTo(src, dest):
     raise NotImplementedError()
-
 

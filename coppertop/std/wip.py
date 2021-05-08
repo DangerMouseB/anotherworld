@@ -5,10 +5,9 @@
 # *******************************************************************************
 
 
-from .._pipe import pipeable, unary1
+from .._pipe import unary1, unary
 
 
-@pipeable(flavour=unary1)
 def Not(b):
     return False if b else True
-
+Not = unary1('Not', unary, Not)

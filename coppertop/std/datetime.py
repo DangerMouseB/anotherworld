@@ -5,7 +5,7 @@
 # *******************************************************************************
 
 
-# TODO handle locales
+# SHOULDDO handle locales
 
 
 import sys
@@ -17,47 +17,47 @@ from .._core import Missing
 
 
 @pipeable
-def Year(x):
+def year(x):
     return x.year
 
 @pipeable
-def Month(x):
+def month(x):
     return x.month
 
 @pipeable
-def Day(x):
+def day(x):
     return x.day
 
 @pipeable
-def Hour(x):
+def hour(x):
     return x.hour
 
 @pipeable
-def Minute(x):
+def minute(x):
     return x.minute
 
 @pipeable
-def Second(x):
+def second(x):
     return x.second
 
 @pipeable
-def Weekday(x):
+def weekday(x):
     return x.weekday()
 
 @pipeable
-def WeekdayName(x, locale=Missing):
+def weekdayName(x, locale=Missing):
     return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][x]
 
 @pipeable
-def WeekdayLongName(x, locale=Missing):
+def weekdayLongName(x, locale=Missing):
     return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][x]
 
 @pipeable
-def MonthName(month, locale=Missing):
+def monthName(month, locale=Missing):
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]
 
 @pipeable
-def MonthLongName(month, locale=Missing):
+def monthLongName(month, locale=Missing):
     return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]
 
 

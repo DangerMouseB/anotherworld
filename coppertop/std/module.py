@@ -11,11 +11,13 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 from .._pipe import pipeable
 
 
+
 @pipeable
 def ensurePath(path):
     import sys
     if path not in sys.path:
         sys.path.insert(0, path)
+
 
 @pipeable
 def printModules(root):
@@ -36,6 +38,7 @@ def printModules(root):
     for name in moduleNames:
         print(name)
 
+
 @pipeable
 def unload(module_name, leave_relative_imports_optimisation=False):
     # for description of relative imports optimisation in earlier versions of python see:
@@ -50,3 +53,4 @@ def unload(module_name, leave_relative_imports_optimisation=False):
                     del sys.modules[name]
             else:
                 del sys.modules[name]
+

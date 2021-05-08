@@ -5,7 +5,7 @@
 # *******************************************************************************
 
 import sys
-# sys._ImportTrace = True
+# sys._ImportTrace = True   # just comment this outwhen not needed
 
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 

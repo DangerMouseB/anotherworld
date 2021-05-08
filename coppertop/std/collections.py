@@ -1,6 +1,6 @@
 # *******************************************************************************
 #
-#    Copyright (c) 2020-2021 David Briant. All rights reserved.
+#    Copyright (c) 2017-2021 David Briant. All rights reserved.
 #
 # *******************************************************************************
 
@@ -9,9 +9,38 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 from .._pipe import pipeable, binary, binary2
-from .struct import struct
+from .struct import struct, nd
 from ._core import assertType
 
+
+# from ..ranges import RMap
+
+
+@pipeable
+def wrapInList(x):
+    l = []
+    l.append(x)
+    return l
+
+@pipeable
+def first(x):
+    raise NotImplementedError()
+
+@pipeable
+def last(x):
+    raise NotImplementedError()
+
+@pipeable
+def take(x):
+    raise NotImplementedError()
+
+@pipeable
+def cut(x):
+    raise NotImplementedError()
+
+@pipeable
+def replaceWith(haystack, needle, replacement):
+    return haystack >> RMap >> (lambda e: replacement if e == needle else e)
 
 @pipeable
 def sort(x, key=None, reverse=False):
@@ -92,6 +121,18 @@ def atPut(xs, iOrIs, yOrYs):
         xs[iOrIs] = yOrYs
     return xs
 
+@pipeable
+def at(xs, iOrIs):
+    if not issubclass(xs.__class__, (list, dict, tuple)):
+        raise TypeError('xs must be a subclass of list, dict or tuple')
+    if isinstance(iOrIs, (list, tuple)):
+        answer = []
+        for i in iOrIs:
+            answer.append(xs[i])
+        return answer
+    else:
+        return xs[iOrIs]
+
 @pipeable(flavour=binary2)
 def intersects(a, b):
     if not isinstance(a, (list, tuple)):
@@ -128,3 +169,10 @@ def subsetOf(a, b):
                     return False
             return True
 
+def _where(s, bools):
+    assert isinstance(s, struct)
+    answer = struct(s)
+    for f, v in s._fvPairs():
+        answer[f] = nd(v.nd[bools.nd])
+    return answer
+where = binary2('where', binary, _where)

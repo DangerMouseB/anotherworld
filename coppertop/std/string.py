@@ -8,7 +8,7 @@ import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-from .._pipe import pipeable, binary
+from .._pipe import pipeable, binary, Pipeable, unary
 from .._core import Missing
 
 
@@ -34,20 +34,16 @@ def split(s1, s2, maxsplit=Missing):
     else:
         return s1.split(s2, maxsplit)
 
-
 @pipeable
-def LJust(w, s, pad=" "):
+def ljust(w, s, pad=" "):
     return s.ljust(w, pad)
 
 @pipeable
-def RJust(w, s, pad=" "):
+def rjust(w, s, pad=" "):
     return s.rjust(w, pad)
 
 @pipeable
-def CJust(w, s, pad=" "):
+def cjust(w, s, pad=" "):
     return s.center(w, pad)
 
-@pipeable
-def Format(format, thing):
-    return format.format(thing)
-
+format = Pipeable('format', unary, format)

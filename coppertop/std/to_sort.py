@@ -1,63 +1,51 @@
-# *******************************************************************************
-#
-#    Copyright (c) 2017-2020 David Briant. All rights reserved.
-#
-# *******************************************************************************
-
-import sys
-if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 from .._pipe import pipeable
 
 @pipeable
-def PushInto(inR, outR):
+def rPushInto(inR, outR):
     while not inR.empty:
         outR.put(inR.front)
         inR.popFront()
     return outR
 
 @pipeable
-def PullFrom(inR, outR):
+def pullFrom(inR, outR):
     while not inR.empty:
         outR.put(inR.front)
         inR.popFront()
     return None
 
 @pipeable
-def RZip(r):
+def rZip(r):
     raise NotImplementedError()
 
 @pipeable
-def RFold(r, f):
+def rInject(r, seed, f):
     raise NotImplementedError()
 
 @pipeable
-def RFoldSeed(seed, r, f):
+def rFilter(r, f):
     raise NotImplementedError()
 
 @pipeable
-def RFilter(r, f):
+def rTake(r, n):
     raise NotImplementedError()
 
 @pipeable
-def RTake(r, n):
+def rTakeBack(r, n):
     raise NotImplementedError()
 
 @pipeable
-def RTakeBack(r, n):
+def rDrop(r, n):
     raise NotImplementedError()
 
 @pipeable
-def RDrop(r, n):
+def rDropBack(r, n):
     raise NotImplementedError()
 
 @pipeable
-def RDropBack(r, n):
-    raise NotImplementedError()
-
-@pipeable
-def Find(r, value):
+def rFind(r, value):
     while not r.empty:
         if r.front == value:
             break
@@ -65,31 +53,38 @@ def Find(r, value):
     return r
 
 @pipeable
-def Put(r, x):
+def rPut(r, x):
     return r.put(x)
 
 @pipeable
-def Front(r):
+def rFront(r):
     return r.front
 
 @pipeable
-def Back(r):
+def rBack(r):
     return r.back
 
 @pipeable
-def Length(r):
+def count(r):
     return r.length
 
 @pipeable
-def Empty(r):
+def empty(r):
     return r.empty
 
 @pipeable
-def PopFront(r):
+def popFront(r):
     r.popFront()
     return r
 
 @pipeable
-def PopBack(r):
+def popBack(r):
     r.popBack()
     return r
+
+
+# @pipeable
+# def EachArgs(listOfArgs, f):
+#     """eachArgs(f, listOfArgs)
+#     Answers [f(*args) for args in listOfArgs]"""
+#     return [f(*args) for args in listOfArgs]
