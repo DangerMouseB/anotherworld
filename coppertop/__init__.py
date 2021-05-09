@@ -11,7 +11,7 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 
-_all = set(['Missing', 'Null', 'getMyPublicMembers', 'getPublicMembersOf', '_'])
+_all = set(['Missing', 'Null', 'Err', 'getMyPublicMembers', 'getPublicMembersOf'])
 
 import inspect
 
@@ -35,10 +35,10 @@ def _getPublicMembersOnly(module):
     return [name for (name, o) in members]
 
 
-from ._core import Missing, Null, ProgrammerError, PathNotTested, NotYetImplemented
+from ._core import Missing, Null, Err, ProgrammerError, PathNotTested, NotYetImplemented
 
 
-# the following are wrapped in exception handlers to make testing and debugging of coppertop easier
+# the following are wrapped in exception handlers to make test driven development and debugging of coppertop easier
 
 try:
     from . import _testing, _pipe
@@ -48,24 +48,25 @@ except:
     pass
 
 try:
-    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1, binary2, _
+    from coppertop._pipe import pipeable, nullary, unary, rau, binary, ternary, unary1, binary2
     _all.update(_getPublicMembersOnly(_pipe))
 except:
     pass
 
-try:
-    from . import std
-    from coppertop.std import *
-    _all.update(_getPublicMembersOnly(std))
-except:
-    pass
-
+# deprecated
 # try:
-#     from .d import stdio
-#     from coppertop.d.stdio import *
-#     _all.update(_getPublicMembersOnly(stdio))
+#     from . import std
+#     from coppertop.std import *
+#     _all.update(_getPublicMembersOnly(std))
 # except:
 #     pass
+
+try:
+    from . import repl
+    from .repl import *
+    _all.update(_getPublicMembersOnly(repl))
+except:
+    pass
 
 try:
     from . import range_interfaces
