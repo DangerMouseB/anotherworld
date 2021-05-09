@@ -62,9 +62,9 @@ except:
 #     pass
 
 try:
-    from . import repl
-    from .repl import *
-    _all.update(_getPublicMembersOnly(repl))
+    from . import _repl
+    from ._repl import *
+    _all.update(_getPublicMembersOnly(_repl))
 except:
     pass
 
