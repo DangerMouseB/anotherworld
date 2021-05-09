@@ -10,6 +10,7 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 from .._pipe import pipeable, binary, binary2
 from .struct import struct, nd
+from .misc import dict_keys
 from ._core import assertType
 
 
@@ -151,15 +152,15 @@ def intersects(a, b):
 
 @pipeable(flavour=binary2)
 def subsetOf(a, b):
-    if not isinstance(a, (list, tuple)):
-        if not isinstance(b, (list, tuple)):
+    if not isinstance(a, (list, set, tuple, dict_keys)):
+        if not isinstance(b, (list, set, tuple, dict_keys)):
             # 1, 1
             return a == b
         else:
             # 1, 1+
             return a in b
     else:
-        if not isinstance(b, (list, tuple)):
+        if not isinstance(b, (list, set, tuple, dict_keys)):
             # 1+, 1
             return False
         else:

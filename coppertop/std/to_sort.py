@@ -65,10 +65,6 @@ def rBack(r):
     return r.back
 
 @pipeable
-def count(r):
-    return r.length
-
-@pipeable
 def empty(r):
     return r.empty
 

@@ -21,7 +21,7 @@ class struct(dict):
             pass
         elif isinstance(_structOrDict, struct):
             super().update(_structOrDict._pairsForTreeCopy)
-        elif isinstance(_structOrDict, dict):
+        elif isinstance(_structOrDict, (dict, list, tuple)):
             super().update(_structOrDict)
         else:
             raise TypeError('first argument must be a prototype struct - got ' + repr(_structOrDict))
