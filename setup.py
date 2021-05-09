@@ -6,6 +6,8 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+version = 'v0.2.5'
+
 setup(
   name = 'coppertop',
   packages = [
@@ -19,15 +21,15 @@ setup(
     'coppertop.time.tests',
   ],
   python_requires='>=3.6',
-  version = 'v0.2.5',
+  version = version,
   license='bsd',
   description = 'Some batteries Python didn\'t come with - including a pipe operator et al',
   long_description_content_type='text/markdown',
   long_description=long_description,
-  author = 'DangerMouseB',
+  author = 'David Briant',
   author_email = 'dangermouseb@forwarding.cc',
   url = 'https://github.com/DangerMouseB/coppertop',
-  download_url = 'https://github.com/DangerMouseB/coppertop/archive/v0.2.4.tar.gz',
+  download_url = f'https://github.com/DangerMouseB/coppertop/archive/{version}.tar.gz',
   keywords = ['piping', 'pipeline', 'pipe', 'functional', 'ranges'],
   install_requires=[],
   include_package_data=True,
@@ -37,7 +39,7 @@ setup(
     'Intended Audience :: End Users/Desktop',
     'Intended Audience :: Science/Research',
     'Topic :: Utilities',
-    'License :: OSI Approved :: Apache Software License',
+    'License :: OSI Approved :: BSD License',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
