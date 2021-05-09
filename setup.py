@@ -10,6 +10,7 @@ setup(
   name = 'coppertop',
   packages = [
     'coppertop',
+    'coppertop.db',
     'coppertop.examples',
     'coppertop.examples.tests',
     'coppertop.std',
@@ -18,7 +19,7 @@ setup(
     'coppertop.time.tests',
   ],
   python_requires='>=3.6',
-  version = 'v0.2.4',
+  version = 'v0.2.5',
   license='bsd',
   description = 'Some batteries Python didn\'t come with - including a pipe operator et al',
   long_description_content_type='text/markdown',
