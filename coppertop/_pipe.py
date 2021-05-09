@@ -37,12 +37,19 @@ class Pipeable(object):
             return df.__rrshift__(arg)
 
     def __rshift__(p, arg):  # p >> arg
-        if p.flavour.numRight == 0:
-            raise SyntaxError(f'{p.name} >> arg - illegal syntax for a {p.flavour.name}')
-        else:
+        if p.flavour.numLeft == 0 and p.flavour.numRight > 0:
+            # only rau can handle this case
             args = [DeferredArg] * p.flavour.numRight
             df = p.flavour(p, False, args, {})
             return df.__rshift__(arg)
+        else:
+            if hasattr(arg, '__rrshift__'):
+                try:
+                    arg.__rrshift__(p)
+                except:
+                    return NotImplemented
+            else:
+                raise SyntaxError(f'{p.name} >> arg - illegal syntax for a {p.flavour.name}')
 
     def __repr__(p):
         return p.name
