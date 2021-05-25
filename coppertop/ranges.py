@@ -4,27 +4,120 @@
 #
 # *******************************************************************************
 
+from __future__ import annotations
 
-# [1,2,3] >> RMap(lambda x:x) >> Materialise >> Max
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
+from typing import Any, Union
+import types
+from ._pipe import Pipeable, pipeable, unary1
+from ._core import Null
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__ + ' - imports done')
 
 
 # d style ranges
 # http://www.informit.com/articles/printerfriendly/1407357 - Andrei Alexandrescu
 # https://www.drdobbs.com/architecture-and-design/component-programming-in-d/240008321 - Walter Bright
 
+# empty - checks for end-of-input and fills a one-element buffer held inside the range object
+# front - returns the buffer
+# popFront() - sets an internal flag that tells empty to read the next element when called
+# moveFront() - moves to the start
 
-from __future__ import annotations
-import sys, types
 
-from coppertop import pipeable
-from ._pipe import Pipeable
-from ._core import Null
-from .range_interfaces import IForwardRange, IOutputRange, IInputRange, IRandomAccessInfinite
+class IInputRange(object):
+    @property
+    def empty(self) -> bool:
+        raise NotImplementedError()
+    @property
+    def front(self) -> Any:
+        raise NotImplementedError()
+    def popFront(self) -> None:
+        raise NotImplementedError()
+    def moveFront(self) -> Any:
+        raise NotImplementedError()
+
+    # assignable
+    @front.setter
+    def front(self, value: Any) -> None:
+        raise NotImplementedError()
+
+    # python iterator interface - so we can use ranges in list comprehensions and for loops!!! ugh
+    # this is convenient but possibly too convenient and it may muddy things hence the ugly name
+    @property
+    def _getIRIter(self):
+        return IInputRange._Iter(self)
+
+    class _Iter(object):
+        def __init__(self, r):
+            self.r = r
+        def __iter__(self) -> IInputRange:
+            return self
+        def __next__(self) -> Any:
+            if self.r.empty: raise StopIteration
+            answer = self.r.front
+            self.r.popFront()
+            return answer
+
+@pipeable
+def getIRIter(r):
+    # the name is deliberately semi-ugly to discourge but not prevent useage - see comment above
+    return r._getIRIter
+
+
+class IForwardRange(IInputRange):
+    def save(self) -> IForwardRange:
+        raise NotImplementedError()
+
+
+class IBidirectionalRange(IForwardRange):
+    @property
+    def back(self) -> Any:
+        raise NotImplementedError()
+    def moveBack(self) -> Any:
+        raise NotImplementedError()
+    def popBack(self) -> None:
+        raise NotImplementedError()
+
+    # assignable
+    @back.setter
+    def back(self, value: Any) -> None:
+        raise NotImplementedError()
+
+
+class IRandomAccessFinite(IBidirectionalRange):
+    def moveAt(self, i: int) -> Any:
+        raise NotImplementedError()
+    def __getitem__(self, i: Union[int, slice]) -> Union[Any, IRandomAccessFinite]:
+        raise NotImplementedError()
+    @property
+    def length(self) -> int:
+        raise NotImplementedError()
+
+    # assignable
+    def __setitem__(self, i: int, value: Any) -> None:
+        raise NotImplementedError()
+
+
+class IRandomAccessInfinite(IForwardRange):
+    def moveAt(self, i: int) -> Any:
+        raise NotImplementedError()
+
+    def __getitem__(self, i: int) -> Any:
+        """Answers an element"""
+        raise NotImplementedError()
+
+
+class IOutputRange(object):
+    def put(self, value: Any):
+        """Answers void"""
+        raise NotImplementedError()
 
 
 @pipeable
-def ToIRangeIfNot(x):
+def toIRangeIfNot(x):
     if isinstance(x, IInputRange):
         return x
     else:
@@ -35,7 +128,6 @@ if not hasattr(sys, '_EMPTY'):
     class _EMPTY(object):
         def __bool__(self):
             return False
-
         def __repr__(self):
             # for pretty display in pycharm debugger
             return 'EMPTY'
@@ -43,16 +135,15 @@ if not hasattr(sys, '_EMPTY'):
 EMPTY = sys._EMPTY
 
 
-class FnAdapterFRange(IForwardRange):
+class FnAdapterFR(IForwardRange):
     # adapts a unary function (that takes a position index) into a forward range
-    Empty = _EMPTY
     def __init__(self, f):
         self.f = f
         self.i = 0
         self.current = self.f(self.i)
     @property
     def empty(self):
-        return self.current == FnAdapterFRange.Empty
+        return self.current == EMPTY
     @property
     def front(self):
         return self.current
@@ -61,15 +152,22 @@ class FnAdapterFRange(IForwardRange):
         if not self.empty:
             self.current = self.f(self.i)
     def save(self):
-        new = FnAdapterFRange(self.f)
+        new = FnAdapterFR(self.f)
         new.i = self.i
         new.current = new.f(new.i)
         return  new
     def repr(self):
-        return 'FnAdapterFRange(%s)[%s]' % (self.f, self.i)
+        return 'FnAdapterFR(%s)[%s]' % (self.f, self.i)
+
+def FnAdapterEager(f):
+    answer = []
+    i = 0
+    while (x := f(i)) != EMPTY:
+        answer.append(x)
+        i += 1
+    return answer
 
 
-@pipeable
 class ChunkFROnChangeOf(IForwardRange):
     def __init__(self, r, f):
         assert isinstance(r, IForwardRange)
@@ -82,7 +180,7 @@ class ChunkFROnChangeOf(IForwardRange):
     @property
     def front(self):
         assert not self.r.empty
-        return _Chunk(self.r, self.f, self.lastF)
+        return _ChunkFR(self.r, self.f, self.lastF)
     def popFront(self):
         assert not self.r.empty
         while not self.r.empty and self.f(self.r.front) == self.lastF:
@@ -94,7 +192,7 @@ class ChunkFROnChangeOf(IForwardRange):
     def __repr__(self):
         return 'ChunkFROnChangeOf(%s,%s)' % (self.r, self.curF)
 
-class _Chunk(IForwardRange):
+class _ChunkFR(IForwardRange):
     def __init__(self, r, f, curF):
         self.r = r
         self.f = f
@@ -109,13 +207,12 @@ class _Chunk(IForwardRange):
         assert not self.r.empty
         self.r.popFront()
     def save(self):
-        return _Chunk(self.r.save(), self.f, self.curF)
+        return _ChunkFR(self.r.save(), self.f, self.curF)
     def __repr__(self):
-        return '_Chunk(%s)' % self.curF
+        return '_ChunkFR(%s)' % self.curF
 
 
-@pipeable
-class Until(IForwardRange):
+class UntilFR(IForwardRange):
     def __init__(self, r, f):
         if not isinstance(r, IForwardRange):
             raise TypeError(str(r))
@@ -135,14 +232,13 @@ class Until(IForwardRange):
         self.r.popFront()
 
     def save(self):
-        return Until(self.r.save(), self.f)
+        return UntilFR(self.r.save(), self.f)
     def __repr__(self):
-        return 'Until(%s,%s)' % (self.r, self.f)
+        return 'UntilFR(%s,%s)' % (self.r, self.f)
 
 
-@pipeable
-class ChunkUsingSubRangeGenerator(IForwardRange):
-    def __init__(self, f, r):
+class ChunkUsingSubRangeGeneratorFR(IForwardRange):
+    def __init__(self, r, f):
         self.r = r
         self.f = f
         self.curSR = None if self.r.empty else self.f(self.r)
@@ -157,12 +253,11 @@ class ChunkUsingSubRangeGenerator(IForwardRange):
         self.curSR = None if self.r.empty else self.f(self.r)
 
     def save(self) -> IForwardRange:
-        new = ChunkUsingSubRangeGenerator(self.f, self.r.save())
+        new = ChunkUsingSubRangeGeneratorFR(self.r.save(), self.f)
         new.curSR = None if self.curSR is None else self.curSR.save()
         return new
 
 
-@pipeable
 class IndexableFR(IForwardRange):
     def __init__(self, indexable):
         self.indexable = indexable
@@ -179,9 +274,9 @@ class IndexableFR(IForwardRange):
         new = IndexableFR(self.indexable.__class__(self.indexable))
         new.i = self.i
         return new
+toIndexableFR = unary1('each', unary1, IndexableFR)
 
 
-@pipeable
 class ListOR(IOutputRange):
     def __init__(self, list):
         self.list = list
@@ -189,10 +284,9 @@ class ListOR(IOutputRange):
         self.list.append(value)
 
 
-@pipeable
-class ChainAsSingleRange(IForwardRange):
+class ChainAsSingleFR(IForwardRange):
     def __init__(self, listOfRanges):
-        self.rOfR = listOfRanges >> IndexableFR
+        self.rOfR = listOfRanges >> toIndexableFR
         if self.rOfR.empty:
             self.curR = None
         else:
@@ -215,12 +309,12 @@ class ChainAsSingleRange(IForwardRange):
 
 
 @pipeable
-def Materialise(r):
+def materialise(r):
     answer = _MaterialisedRange()
     while not r.empty:
         e = r.front
         if isinstance(e, IInputRange) and not isinstance(e, IRandomAccessInfinite):
-            answer.append(e >> Materialise)
+            answer.append(e >> materialise)
             if not r.empty:  # the sub range may exhaust this range
                 r.popFront()
         else:
@@ -232,11 +326,9 @@ class _MaterialisedRange(list):
         return 'MR' + super().__repr__()
 
 
-# RMap rather than Map to make explicit that it is unrelated to python's map
-@pipeable
-class RMap(IForwardRange):
+class EachFR(IForwardRange):
     def __init__(self, r, fn):
-        self.r = r >> ToIRangeIfNot
+        self.r = r >> toIRangeIfNot
         if type(fn) != types.FunctionType and type(fn) != Pipeable:
             raise TypeError("RMAP.__init__ fn should be a function but got a %s" % type(fn))
         self.f = fn
@@ -249,10 +341,9 @@ class RMap(IForwardRange):
     def popFront(self):
         self.r.popFront()
     def save(self):
-        return RMap(self.r.save(), self.f)
+        return EachFR(self.r.save(), self.f)
 
 
-@pipeable
 class FileLineIR(IInputRange):
     def __init__(self, f, stripNL=False):
         self.f = f
@@ -267,12 +358,11 @@ class FileLineIR(IInputRange):
         self.line = self.f.readline()
 
 
-@pipeable
-class RRaggedZip(IInputRange):
+class RaggedZipIR(IInputRange):
     """As RZip but input ranges do not need to be of same length, shorter ranges are post padded with Null"""
     def __init__(self, ror):
         self.ror = ror
-        self.allEmpty = ror >> AllSubRangesExhausted
+        self.allEmpty = ror >> allSubRangesExhausted
     @property
     def empty(self):
         return self.allEmpty
@@ -302,7 +392,7 @@ class RRaggedZip(IInputRange):
 
 
 @pipeable
-def AllSubRangesExhausted(ror):
+def allSubRangesExhausted(ror):
     ror = ror.save()
     answer = True
     while not ror.empty:
@@ -311,3 +401,5 @@ def AllSubRangesExhausted(ror):
             break
     return answer
 
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__ + ' - done')

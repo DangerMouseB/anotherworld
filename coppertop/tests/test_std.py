@@ -18,25 +18,24 @@
 
 
 import operator
-from .. import assertEquals
-from .._pipe import pipeable
-from ..std import Chain, Each, EachArgs
+from coppertop.std import assertEquals, _, inject, each, eachAsArgs
+from coppertop import pipeable
 
 def test_stuff():
     2 >> assertEquals >> 2
 
     @pipeable
-    def SquareIt(x):
+    def squareIt(x):
         return x * x
 
     @pipeable
-    def Add(x, y):
+    def add(x, y):
         return x + y
 
-    [1,2,3] >> Each >> SquareIt >> Chain(seed=0) >> Add >> assertEquals >> 14
+    [1,2,3] >> each >> squareIt >> inject(_, 0, _) >> add >> assertEquals >> 14
 
-    [[1,2], [2,3], [3,4]] >> EachArgs >> Add >> assertEquals >> [3, 5, 7]
-    [[1, 2], [2, 3], [3, 4]] >> EachArgs >> operator.add >> assertEquals >> [3, 5, 7]
+    [[1,2], [2,3], [3,4]] >> eachAsArgs >> add >> assertEquals >> [3, 5, 7]
+    [[1, 2], [2, 3], [3, 4]] >> eachAsArgs >> operator.add >> assertEquals >> [3, 5, 7]
 
 
 def main():

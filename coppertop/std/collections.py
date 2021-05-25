@@ -8,20 +8,44 @@ import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-from .._pipe import pipeable, binary, binary2
+from .._pipe import pipeable, binary, binary2, unary1
 from .struct import struct, nd
-from .misc import dict_keys
+from .misc import dict_keys, dict_values
+from .adverbs import rEach
 from ._core import assertType
-
-
-# from ..ranges import RMap
 
 
 @pipeable
 def wrapInList(x):
-    l = []
+    l = list()
     l.append(x)
     return l
+
+@pipeable
+def put(r, x):
+    return r.put(x)
+
+@pipeable(flavour=unary1)
+def front(r):
+    return r.front
+
+@pipeable(flavour=unary1)
+def back(r):
+    return r.back
+
+@pipeable(flavour=unary1)
+def empty(r):
+    return r.empty
+
+@pipeable(flavour=unary1)
+def popFront(r):
+    r.popFront()
+    return r
+
+@pipeable(flavour=unary1)
+def popBack(r):
+    r.popBack()
+    return r
 
 @pipeable
 def first(x):
@@ -32,16 +56,16 @@ def last(x):
     raise NotImplementedError()
 
 @pipeable
-def take(x):
+def take(x, n):
     raise NotImplementedError()
 
 @pipeable
-def cut(x):
+def drop(x, n):
     raise NotImplementedError()
 
 @pipeable
 def replaceWith(haystack, needle, replacement):
-    return haystack >> RMap >> (lambda e: replacement if e == needle else e)
+    return haystack >> rEach >> (lambda e: replacement if e == needle else e)
 
 @pipeable
 def sort(x, key=None, reverse=False):
@@ -50,9 +74,13 @@ def sort(x, key=None, reverse=False):
     else:
         return sorted(x, key=key, reverse=reverse)
 
-@pipeable
-def count(iter):
-    return len(iter)
+@pipeable(flavour=unary1)
+def count(x):
+    if isinstance(x, struct):
+        f = next(iter(x._fields()))
+        return x[f] >> count
+    else:
+        return len(x)
 
 @pipeable(flavour=binary2)
 def join(xs, ysOrSep):
@@ -123,6 +151,10 @@ def atPut(xs, iOrIs, yOrYs):
     return xs
 
 @pipeable
+def fromto(x, s1, s2=None):
+    return x[s1:s2]
+
+@pipeable
 def at(xs, iOrIs):
     if not issubclass(xs.__class__, (list, dict, tuple)):
         raise TypeError('xs must be a subclass of list, dict or tuple')
@@ -136,13 +168,13 @@ def at(xs, iOrIs):
 
 @pipeable(flavour=binary2)
 def intersects(a, b):
-    if not isinstance(a, (list, tuple)):
-        if not isinstance(b, (list, tuple)):
+    if not isinstance(a, (list, tuple, set, dict_keys, dict_values)):
+        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
             return a == b
         else:
             return a in b
     else:
-        if not isinstance(b, (list, tuple)):
+        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
             return b in a
         else:
             for e in a:
@@ -152,15 +184,15 @@ def intersects(a, b):
 
 @pipeable(flavour=binary2)
 def subsetOf(a, b):
-    if not isinstance(a, (list, set, tuple, dict_keys)):
-        if not isinstance(b, (list, set, tuple, dict_keys)):
+    if not isinstance(a, (list, set, tuple, dict_keys, dict_values)):
+        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
             # 1, 1
             return a == b
         else:
             # 1, 1+
             return a in b
     else:
-        if not isinstance(b, (list, set, tuple, dict_keys)):
+        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
             # 1+, 1
             return False
         else:
@@ -177,3 +209,23 @@ def _where(s, bools):
         answer[f] = nd(v.nd[bools.nd])
     return answer
 where = binary2('where', binary, _where)
+
+
+@pipeable
+def rename(d, old, new):
+    if isinstance(d, struct):
+        d = struct(d)
+        d[new] = d._pop(old)
+        return d
+
+    else:
+        d = dict(d)
+        d[new] = d.pop(old)
+        return d
+
+
+@pipeable
+def replace(d, f, new):
+    d = struct(d) if isinstance(d, struct) else dict(d)
+    d[f] = new
+    return d

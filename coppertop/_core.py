@@ -10,6 +10,7 @@
 # we keep them on sys so their identity isn't changed on reload (a frequent
 # occurrence in Jupyter)
 import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
 # something should / could be there but it is missing
@@ -50,6 +51,7 @@ Err = sys._ERR
 
 
 class ProgrammerError(Exception): pass
+class UnhappyWomble(Exception): pass
 class NotYetImplemented(Exception): pass
 class PathNotTested(Exception): pass
 

@@ -8,11 +8,12 @@ import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 
-import itertools
+import itertools, builtins
 import numpy as np
 
-from .._pipe import pipeable, binary, ternary, binary2
+from .._pipe import pipeable, binary, ternary, binary2, unary1, unary
 from .struct import struct, _nd, nd
+from ..ranges import EachFR, ChainAsSingleFR, UntilFR
 
 
 @pipeable(flavour=ternary)
@@ -39,6 +40,9 @@ def each(xs, f):
         return [f(x) for x in xs]
 each = binary2('each', binary, each)
 
+rEach = binary2('rEach', binary2, EachFR)
+rChain = unary1('rChain', unary1, ChainAsSingleFR)
+rUntil = binary2('rUntil', binary2, UntilFR)
 
 def ieach(xs, f2):
     """each(xs, f)  e.g. xs >> each >> f
@@ -81,3 +85,21 @@ def _pairwise(iterable):
     return zip(a, b)
 
 
+@pipeable(flavour=unary1)
+def zip(x):
+    return builtins.zip(*x)
+
+
+@pipeable(flavour=binary2)
+def pushAllTo(inR, outR):
+    while not inR.empty:
+        outR.put(inR.front)
+        inR.popFront()
+    return outR
+
+
+@pipeable(flavour=binary2)
+def eachAsArgs(listOfArgs, f):
+    """eachAsArgs(f, listOfArgs)
+    Answers [f(*args) for args in listOfArgs]"""
+    return [f(*args) for args in listOfArgs]

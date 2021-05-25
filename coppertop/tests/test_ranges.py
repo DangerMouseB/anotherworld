@@ -18,10 +18,8 @@
 
 
 
-from .. import assertEquals, assertRaises
-from ..ranges import IndexableFR, ListOR, ChainAsSingleRange, RMap, Materialise
-from ..range_interfaces import GetIRIter
-
+from coppertop.std import assertEquals, rEach, materialise, rChain
+from coppertop.ranges import IndexableFR, ListOR, getIRIter
 
 
 def test_listRanges():
@@ -33,17 +31,15 @@ def test_listRanges():
     r.indexable >> assertEquals >> o.list
 
 def test_rangeOrRanges():
-    rOfR = [] >> ChainAsSingleRange
-    [e for e in rOfR >> GetIRIter] >> assertEquals >> []
-    rOfR = (IndexableFR([]), IndexableFR([])) >> ChainAsSingleRange
-    [e for e in rOfR >> GetIRIter] >> assertEquals >> []
-    rOfR = (IndexableFR([1]), IndexableFR([2])) >> ChainAsSingleRange
-    [e for e in rOfR >> GetIRIter] >> assertEquals >> [1,2]
+    rOfR = [] >> rChain
+    [e for e in rOfR >> getIRIter] >> assertEquals >> []
+    rOfR = (IndexableFR([]), IndexableFR([])) >> rChain
+    [e for e in rOfR >> getIRIter] >> assertEquals >> []
+    rOfR = (IndexableFR([1]), IndexableFR([2])) >> rChain
+    [e for e in rOfR >> getIRIter] >> assertEquals >> [1,2]
 
 def test_other():
-    with assertRaises(TypeError):
-        [1, 2, 3] >> RMap(lambda x: x) >> Materialise >> assertEquals >> [1, 2, 3]
-    [1, 2, 3] >> RMap >> (lambda x: x) >> Materialise >> assertEquals >> [1, 2, 3]
+    [1, 2, 3] >> rEach >> (lambda x: x) >> materialise >> assertEquals >> [1, 2, 3]
 
 def main():
     test_listRanges()

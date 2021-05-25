@@ -17,11 +17,11 @@
 # *******************************************************************************
 
 
-from coppertop.testing import AssertEqual
+from coppertop.std import assertEquals
 from ..count_lines_jsp import countLinesJsp, countLinesTrad, countLinesRanges1, countLinesRanges2, countLinesRanges3
 
 
-home = '/Users/david/shared/repos/github/DangerMouseB/coppertop/coppertop/examples/tests/'
+home = '/Users/david/repos/github/DangerMouseB/coppertop/coppertop/examples/tests/'
 filename = "linesForCounting.txt"
 expected = [
     ('aaa\n', 2),
@@ -34,23 +34,23 @@ expected = [
 def main():
     with open(home + filename) as f:
         actual = countLinesJsp(f)
-    actual >> AssertEqual >> expected
+    actual >> assertEquals >> expected
 
     with open(home + filename) as f:
         actual = countLinesTrad(f)
-    actual >> AssertEqual >> expected
+    actual >> assertEquals >> expected
 
     with open(home + filename) as f:
         actual = countLinesRanges1(f)
-    actual >> AssertEqual >> expected
+    actual >> assertEquals >> expected
 
     with open(home + filename) as f:
         actual = countLinesRanges2(f)
-    actual >> AssertEqual >> expected
+    actual >> assertEquals >> expected
 
     with open(home + filename) as f:
         actual = countLinesRanges3(f)
-    actual >> AssertEqual >> expected
+    actual >> assertEquals >> expected
 
     print('pass')
 

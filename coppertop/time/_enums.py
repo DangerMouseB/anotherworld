@@ -4,8 +4,13 @@
 #
 # *******************************************************************************
 
-from coppertop._pipe import pipeable
+from __future__ import annotations
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
+from coppertop._pipe import pipeable
 
 
 class NamedEnum(object):
@@ -18,7 +23,6 @@ class NamedEnum(object):
 
 
 class ObserversCtx(NamedEnum):pass
-
 
 
 _FpMLCityByName = {}

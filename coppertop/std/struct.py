@@ -55,6 +55,8 @@ class struct(dict):
                 return answer
             if field == '_values':
                 return super().values
+            if field == '_pop':
+                return super().pop
             if field == '_update':
                 return super().update
             if field == '_setdefault':

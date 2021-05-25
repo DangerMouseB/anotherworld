@@ -24,7 +24,9 @@
 # the range r I'm not sure how one can claim it is functional.
 
 
-from coppertop import *
+from coppertop import pipeable
+from coppertop.std import put, pushAllTo, getAttr, _
+from coppertop.ranges import FileLineIR, ListOR, IInputRange
 
 
 def countLinesTrad(f):
@@ -58,14 +60,14 @@ def countLinesRanges1(f):
     while not r.empty:
         if firstLineOfGroup == '' or r.front != firstLineOfGroup:
             if firstLineOfGroup != '':
-                out >> Put >> (firstLineOfGroup, count)
+                out >> put(_, (firstLineOfGroup, count))
             count = 0
             firstLineOfGroup = r.front
         count += 1
         r.popFront()
 
     if firstLineOfGroup != '':
-        out >> Put >> (firstLineOfGroup, count)
+        out >> put(_, (firstLineOfGroup, count))
 
     return out.list
 
@@ -75,13 +77,13 @@ def countLinesRanges2(f):
     out = ListOR([])
     r = FileLineIR(f)
     while not r.empty:
-        count = r >> CountEquals >> (firstLineOfGroup := r.front)
-        out >> Put >> (firstLineOfGroup, count)
+        count = r >> countEquals(_, firstLineOfGroup := r.front)
+        out >> put(_, (firstLineOfGroup, count))
     return out.list
 
 
 @pipeable
-def CountEquals(r, value):
+def countEquals(r, value):
     count = 0
     while not r.empty and r.front == value:
         count += 1
@@ -91,14 +93,14 @@ def CountEquals(r, value):
 
 
 def countLinesRanges3(f):
-    return FileLineIR(f) >> RepititionCounter >> PushInto >> ListOR([]) >> GetAttr >> 'list'
+    return FileLineIR(f) >> rRepititionCounts >> pushAllTo >> ListOR([]) >> getAttr(_, 'list')
 
 
 @pipeable
-def RepititionCounter(r):
-    return _RepititionCounter(r)
+def rRepititionCounts(r):
+    return RepititionCountIR(r)
 
-class _RepititionCounter(IInputRange):
+class RepititionCountIR(IInputRange):
     def __init__(self, r):
         self.r = r
     @property

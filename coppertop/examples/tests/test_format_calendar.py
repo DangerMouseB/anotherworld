@@ -17,27 +17,28 @@
 # *******************************************************************************
 
 
-from coppertop.examples.format_calendar import *
-from coppertop.examples.format_calendar import _UntilWeekdayName
-from coppertop import time
-from coppertop.time import AddPeriod, DaySecond, ParseAbstractDate, YYYY_MM_DD
+from coppertop.examples.format_calendar import datesInYear, monthChunks, weekChunks, weekStrings, monthTitle, \
+    monthLines, monthStringsToCalendarRow
+from coppertop.examples.format_calendar import _untilWeekdayName
+from coppertop.time import addPeriod, DaySecond, parseAbstractDate, YYYY_MM_DD, AbstractDate
+from coppertop.ranges import EMPTY, getIRIter, ListOR, toIndexableFR, RaggedZipIR, FnAdapterFR, \
+    ChunkUsingSubRangeGeneratorFR
+from coppertop.std import assertEquals, each, strip, front, take, pushAllTo, not_, _, count, rEach, materialise, \
+    day, wrapInList, rChain
+from coppertop import Null, PP, pipeable, binary2
 
 
 # see notes in format_calendar.py
 
 
-# utilities to help testing
-
 @pipeable
-def _IthDateBetween(start, end, i):
-    ithDate = start >> time.AddPeriod(DaySecond(i))
-    return FnAdapterFRange.Empty if ithDate > end else ithDate
+def _ithDateBetween(start, end, i):
+    ithDate = start >> addPeriod(_, DaySecond(i))
+    return EMPTY if ithDate > end else ithDate
 
-@pipeable
-def DatesBetween(start, end):
-     return FnAdapterFRange((start, end) >> args >> _IthDateBetween)
-
-
+@pipeable(flavour=binary2)
+def datesBetween(start, end):
+     return FnAdapterFR(_ithDateBetween(start, end, _))
 
 
 
@@ -48,57 +49,57 @@ def main():
     test_datesBetween()
     test_chunkingIntoMonths()
     test_checkNumberOfDaysInEachMonth()
-    test__UntilWeekdayName()
+    test__untilWeekdayName()
     test_WeekChunks()
     test_WeekStrings()
     test_MonthTitle()
     test_oneMonthsOutput()
-    test_firstQuarter()
+    # test_firstQuarter()
     print('pass')
 
 
 def test_allDaysInYear():
     actual = []
-    o = 2020 >> DatesInYear >> PushInto >> ListOR(actual)
-    actual[0] >> assertEquals >> time.AbstractDate(2020, 1, 1)
-    actual[-1] >> assertEquals >> time.AbstractDate(2020, 12, 31)
-    [e for e in 2020 >> DatesInYear >> GetIRIter] >> Len >> assertEquals >> 366
+    o = 2020 >> datesInYear >> pushAllTo >> ListOR(actual)
+    actual[0] >> assertEquals >> AbstractDate(2020, 1, 1)
+    actual[-1] >> assertEquals >> AbstractDate(2020, 12, 31)
+    [e for e in 2020 >> datesInYear >> getIRIter] >> count >> assertEquals >> 366
 
 
 def test_datesBetween():
-    ('2020.01.16' >> ParseAbstractDate(YYYY_MM_DD)) >> DatesBetween >> ('2020.01.29' >> ParseAbstractDate(YYYY_MM_DD)) \
-    >> RMap >> Day \
-    >> Materialise >> assertEquals >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    ('2020.01.16' >> parseAbstractDate(_, YYYY_MM_DD)) >> datesBetween >> ('2020.01.29' >> parseAbstractDate(_, YYYY_MM_DD)) \
+    >> rEach >> day \
+    >> materialise >> assertEquals >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 
 
 def test_chunkingIntoMonths():
-    2020 >> DatesInYear \
-        >> MonthChunks \
-        >> Materialise \
-        >> Len >> assertEquals >> 12
+    2020 >> datesInYear \
+        >> monthChunks \
+        >> materialise \
+        >> count >> assertEquals >> 12
 
 
 def test_checkNumberOfDaysInEachMonth():
-    2020 >> DatesInYear \
-        >> MonthChunks \
-        >> Materialise >> Each >> Len \
+    2020 >> datesInYear \
+        >> monthChunks \
+        >> materialise >> each >> count \
         >> assertEquals >> [31,29,31,30,31,30,31,31,30,31,30,31]
 
 
-def test__UntilWeekdayName():
-    r = 2020 >> DatesInYear
-    dates = [d for d in r >> _UntilWeekdayName(weekdayName='Sun') >> GetIRIter]
-    dates[-1] >> assertEquals >> time.AbstractDate(2020, 1, 5)   # the sunday
-    r >> Front >> assertEquals >> time.AbstractDate(2020, 1, 6) # the monday
+def test__untilWeekdayName():
+    r = 2020 >> datesInYear
+    dates = [d for d in r >> _untilWeekdayName(_, wdayName='Sun') >> getIRIter]
+    dates[-1] >> assertEquals >> AbstractDate(2020, 1, 5)   # the sunday
+    r >> front >> assertEquals >> AbstractDate(2020, 1, 6) # the monday
 
 
 def test_WeekChunks():
-    datesR = DatesBetween('2020.01.16' >> ParseAbstractDate(YYYY_MM_DD), '2020.01.29' >> ParseAbstractDate(YYYY_MM_DD))
-    weeksR = datesR >> ChunkUsingSubRangeGenerator(_UntilWeekdayName(weekdayName='Sun'))
+    datesR = '2020.01.16' >> parseAbstractDate(_, YYYY_MM_DD) >> datesBetween >> ('2020.01.29' >> parseAbstractDate(_, YYYY_MM_DD))
+    weeksR = ChunkUsingSubRangeGeneratorFR(datesR, _untilWeekdayName(_, wdayName='Sun'))
     actual = []
     while not weeksR.empty:
-        weekR = weeksR.front
-        actual.append([d >> Day for d in weekR >> GetIRIter])
+        weekR = weeksR >> front
+        actual.append([d >> day for d in weekR >> getIRIter])
         weeksR.popFront()
     actual >> assertEquals >> [[16, 17, 18, 19], [20, 21, 22, 23, 24, 25, 26], [27, 28, 29]]
 
@@ -112,49 +113,50 @@ def test_WeekStrings():
         ' 27 28 29 30 31      ',
     ]
     weekStringsR = (
-        2020 >> DatesInYear
-        >> MonthChunks
-        >> Front
-        >> WeekChunks
-        >> WeekStrings
+        2020 >> datesInYear
+        >> monthChunks
+        >> front
+        >> weekChunks
+        >> weekStrings
     )
     weekStringsR2 = weekStringsR.save()
-    [ws for ws in weekStringsR >> GetIRIter] >> assertEquals >> expectedJan2020
+    [ws for ws in weekStringsR >> getIRIter] >> assertEquals >> expectedJan2020
 
-    actual = [ws for ws in weekStringsR2 >> GetIRIter]
-    if actual >> assertEquals(returnResult=True) >> expectedJan2020 >> Not: "fix WeekStrings.save()" >> PP
+    actual = [ws for ws in weekStringsR2 >> getIRIter]
+    if actual >> assertEquals(_, _, returnResult=True) >> expectedJan2020 >> not_:
+        "fix WeekStringsRange.save()" >> PP
 
 
 def test_MonthTitle():
-    1 >> MonthTitle(..., 21) >> WrapInList >> IndexableFR \
-        >> RMap >> Strip >> Materialise \
+    1 >> monthTitle(..., 21) >> wrapInList >> toIndexableFR \
+        >> rEach >> strip >> materialise \
         >> assertEquals \
         >> ['January']
 
 
 def test_oneMonthsOutput():
     [
-        1 >> MonthTitle(width=21) >> WrapInList >> IndexableFR,
-        2020 >> DatesInYear
-            >> MonthChunks
-            >> Front
-            >> WeekChunks
-            >> WeekStrings
-    ] >> ChainAsSingleRange \
-        >> Materialise >> assertEquals >> Jan2020TitleAndDateLines
+        1 >> monthTitle(_, width=21) >> wrapInList >> toIndexableFR,
+        2020 >> datesInYear
+            >> monthChunks
+            >> front
+            >> weekChunks
+            >> weekStrings
+    ] >> rChain \
+        >> materialise >> assertEquals >> Jan2020TitleAndDateLines
 
     # equivalently
     assertEquals(
-        Materialise(MonthLines(Front(MonthChunks(DatesInYear(2020))))),
+        materialise(monthLines(front(monthChunks(datesInYear(2020))))),
         Jan2020TitleAndDateLines
     )
 
 
 def test_firstQuarter():
-    2020 >> DatesInYear \
-        >> MonthChunks \
-        >> RTake(3) \
-        >> RRaggedZip >> RMap >> MonthStringsToCalendarRow(na, " "*21, " ")
+    2020 >> datesInYear \
+        >> monthChunks \
+        >> take(_, 3) \
+        >> RaggedZipIR >> rEach >> monthStringsToCalendarRow(Null, " "*21, " ")
 
 
 

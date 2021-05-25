@@ -4,9 +4,9 @@
 #
 # *******************************************************************************
 
-from ... import assertEquals
+from ...std import assertEquals
 from .._core import AbstractDateTime, AbstractDate, ObservedTimeOfDay, ObservedDateTime, AbstractTimeOfDay, Precision, \
-    ParseAbstractDateTime, ParseAbstractDate, ParseObservedTimeOfDay, ParseObservedDateTime, ParseObserversCtx, ParseAbstractTimeOfDay, \
+    ParseAbstractDateTime, parseAbstractDate, ParseObservedTimeOfDay, ParseObservedDateTime, ParseObserversCtx, ParseAbstractTimeOfDay, \
     ToString, \
     ObserversCtx, FpMLCity, IanaCity, IanaTz, \
     YYYY_MM_DD
@@ -27,7 +27,7 @@ def test_parsing():
 
 
     # AbstractDate
-    "2020.01.01" >> ParseAbstractDate(format=YYYY_MM_DD) >> assertEquals >> AbstractDate(2020, 1, 1)
+    "2020.01.01" >> parseAbstractDate(format=YYYY_MM_DD) >> assertEquals >> AbstractDate(2020, 1, 1)
 
 
     # ParseDateTimeTz
@@ -45,14 +45,14 @@ def test_parsing():
     ymdhms >> assertEquals >> YMDHMS(2020,1,1,16,15,0,100,Precision.us)
 
     ymdhms >> ToTz(FpMLCity.GBLO) >> assertEquals >> ObservedDateTime(
-        "2020.06.01" >> ParseAbstractDate(format='yyyy.MM.dd'),
+        "2020.06.01" >> parseAbstractDate(format='yyyy.MM.dd'),
         "16:15:00.0001" >> ParseAbstractTimeOfDay(format='HH:MM.SS.us'),
         FpMLCity.GBLO
     )
 
 
     # YearMonth
-    "H20" >> ParseYearMonth(format='HMUZyy') >> assertEquals >> YearMonth(2020,3)
+    "H20" >> parseYearMonth(format='HMUZyy') >> assertEquals >> YearMonth(2020,3)
     "H0" >> ParseYearMonth(format='HMUZy', observationDate=AbstractDate(2020, 4, 1)) >> assertEquals >> YearMonth(2030, 3)
     "3/70" >> ParseYearMonth(format='M/yy') >> assertEquals >> YearMonth(1970,3)
     "3/20" >> ParseYearMonth(format='M/yy', century=1900) >> assertEquals >> YearMonth(1920,3)

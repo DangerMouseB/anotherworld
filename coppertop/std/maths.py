@@ -13,7 +13,7 @@ _EPS = 7.105427357601E-15      # i.e. double precision
 import builtins
 
 from .._core import Missing
-from .._pipe import pipeable
+from .._pipe import pipeable, binary
 
 try:
     import numpy
@@ -21,7 +21,7 @@ except:
     numpy = Missing
 
 
-@pipeable
+@pipeable(flavour=binary)
 def closeTo(a, b, tolerance=_EPS):
     if abs(a) < tolerance:
         return abs(b) < tolerance

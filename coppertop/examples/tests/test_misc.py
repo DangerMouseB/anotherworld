@@ -19,17 +19,17 @@
 
 
 from ..misc import Fred
-from ... import AssertEqual, ToString, cout
+from ...std import assertEquals, toStr, cout
 
 def test_repr_or_str():
-    [Fred(1)] >> ToString >> AssertEqual >> '[rep(1)]'
+    [Fred(1)] >> toStr >> assertEquals >> '[rep(1)]'
 
 
 def main():
     test_repr_or_str()
-    cout << 'pass\n'
 
 
 if __name__ == '__main__':
     main()
+    cout << 'pass\n'
 

@@ -4,9 +4,13 @@
 #
 # *******************************************************************************
 
-import sys, traceback, contextlib
-# from io import StringIO
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
+import traceback, contextlib
+# from io import StringIO
 
 
 @contextlib.contextmanager

@@ -16,3 +16,5 @@
 #
 # *******************************************************************************
 
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)

@@ -35,15 +35,15 @@ def split(s1, s2, maxsplit=Missing):
         return s1.split(s2, maxsplit)
 
 @pipeable
-def ljust(w, s, pad=" "):
-    return s.ljust(w, pad)
+def ljust(s, n, pad=" "):
+    return s.ljust(n, pad)
 
 @pipeable
-def rjust(w, s, pad=" "):
-    return s.rjust(w, pad)
+def rjust(s, n, pad=" "):
+    return s.rjust(n, pad)
 
 @pipeable
-def cjust(w, s, pad=" "):
-    return s.center(w, pad)
+def cjust(s, n, pad=" "):
+    return s.center(n, pad)
 
 format = Pipeable('format', unary, format)

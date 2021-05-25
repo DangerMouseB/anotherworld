@@ -11,9 +11,9 @@
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-
+import datetime
 from .._pipe import pipeable
-from .._core import Missing
+from .._core import Missing, NotYetImplemented
 
 
 @pipeable
@@ -60,4 +60,12 @@ def monthName(month, locale=Missing):
 def monthLongName(month, locale=Missing):
     return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]
 
+@pipeable
+def parseDate(s, f):
+    if f == 'dd/MM/yyyy':
+        return datetime.datetime.strptime(s, '%d/%m/%y').date()
+    if f == 'MM/dd/yyyy':
+        return datetime.datetime.strptime(s, '%m/%d/%y').date()
+    else:
+        raise NotYetImplemented()
 

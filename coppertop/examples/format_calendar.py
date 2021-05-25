@@ -17,79 +17,46 @@
 # *******************************************************************************
 
 
-
 # A python implementation of  https://wiki.dlang.org/Component_programming_with_ranges
-# I found developing this a little too hard to do in a jupyter notebook so used PyCharm community edition
 
 
-# When I first read the article I was bothered as my mind was asking "where's the magic?". To
-# print the calendar the algorithm must visit each actual dates 3 times - once to generate
-# the month chunks which happens in the take(3) statement (which also returns 3 new ranges that
-# start on the month boundaries - once I figured that out my mind stopped asking where's the magic),
-# once to determine the month widths (in pasteBlocks), and lastly to format the actual calendar.
-#
-# From the top down I think there are 2 key things to notice in order to solve the problem, 1) that the
-# problem involves creating 4 rows of 3 separate month streams, and, 2) that formatting a month only
-# requires one pass through each stream. The rest is mechanics.
-#
-# Two more questions to answer, performance and code style
-#
-# As a high level array and matrix programmer who only uses low level languages for numerical
-# computations, until some colleagues pointed it out to me, I didn't appreciate that:
-#     memory speed is slower than processor speed - see the playstation article
-#     memory allocation is really expensive
-#
-# Maybe ranges won't speed up my Python code - especially as I'm binding the arguments to the
-# functions in the PipeableFunction class. I can imagine they might help performance and memory
-# usage in D.
-#
-# In Python the final arbiter will be code quality. Can you the reader follow it? How long does it take
-# for someone (measure both the author and others) to make interesting and unexpected changes to it?
-#
-# A claim made of D is that it is plastic. Given the foundation of the pipeable module some of this
-# plasticity should follow with the usage of the ranges module. I have found it enjoyable to replace
-# list comprehensions and for each in iter: statements with piped function calls.
-#
-# Clearly this code is not currently idiomatic Python, but does the addition of ranges to pipeable
-# help or hinder? Answers on a postcard pls.
-
-
-from coppertop import time
-from coppertop.time import AddPeriod, DaySecond
-from coppertop import *
-from coppertop import Null
-
-# ?datesInYear
-@pipeable
-def DatesInYear(year):
-     return FnAdapterFRange(year >> _IthDateInYear)
-@pipeable
-def _IthDateInYear(year, i):
-    ithDate = time.AbstractDate(year, 1, 1) >> AddPeriod(DaySecond(i))
-    return FnAdapterFRange.Empty if ithDate.year != year else ithDate
-
-
-# ?byMonth
-@pipeable
-def MonthChunks(datesR):
-    return datesR >> ChunkFROnChangeOf >> (lambda x: x.month)
-
-
-# ?byWeek
-@pipeable
-def _UntilWeekdayName(datesR, weekdayName):
-    return datesR >> Until(f=lambda d: d >> Weekday >> WeekdayName == weekdayName)
-WeekChunks = ChunkUsingSubRangeGenerator(_UntilWeekdayName(weekdayName='Sun'))
+from coppertop import pipeable, Null, unary1
+from coppertop.time import addPeriod, DaySecond, AbstractDate
+from coppertop.ranges import ChunkUsingSubRangeGeneratorFR, FnAdapterFR, ChunkFROnChangeOf, IForwardRange, \
+    EMPTY, toIndexableFR
+from coppertop.std import day, weekday, weekdayName, materialise, rEach, count, monthLongName, _, rjust, cjust, \
+    toStr, join, wrapInList, replaceWith, rChain, rUntil
 
 
 @pipeable
-def DateAsDayString(d):
-    return d >> Day >> ToStr >> RJust(3)
-
-
-# ?formatWeek
+def datesInYear(year):
+     return FnAdapterFR(_ithDateInYear(year, _))
 @pipeable
-class WeekStrings(IForwardRange):
+def _ithDateInYear(year, i):
+    ithDate = AbstractDate(year, 1, 1) >> addPeriod(_, DaySecond(i))
+    return EMPTY if ithDate.year != year else ithDate
+
+
+@pipeable
+def monthChunks(datesR):
+    return ChunkFROnChangeOf(datesR, lambda x: x.month)
+
+
+@pipeable
+def _untilWeekdayName(datesR, wdayName):
+    return datesR >> rUntil >> (lambda d: d >> weekday >> weekdayName == wdayName)
+@pipeable
+def weekChunks(r):
+    return ChunkUsingSubRangeGeneratorFR(r, _untilWeekdayName(_, wdayName='Sun'))
+
+
+@pipeable
+def dateAsDayString(d):
+    return d >> day >> toStr >> rjust(_, 3)
+
+
+@pipeable
+class WeekStringsRange(IForwardRange):
     def __init__(self, rOfWeeks):
         self.rOfWeeks = rOfWeeks
 
@@ -101,42 +68,39 @@ class WeekStrings(IForwardRange):
     def front(self):
         # this exhausts the front week range
         week = self.rOfWeeks.front
-        startDay = week.front >> Weekday
+        startDay = week.front >> weekday
         preBlanks = ['   '] * startDay
-        dayStrings = week >> RMap >> DateAsDayString >> Materialise
-        postBlanks = ['   '] * (7 - ((dayStrings >> Len) + startDay))
-        return (preBlanks + dayStrings + postBlanks) >> JoinUsing >> ''
+        dayStrings = week >> rEach >> dateAsDayString >> materialise
+        postBlanks = ['   '] * (7 - ((dayStrings >> count) + startDay))
+        return (preBlanks + dayStrings + postBlanks) >> join >> ''
 
     def popFront(self):
         self.rOfWeeks.popFront()
 
     def save(self):
         # TODO delete once we've debugged the underlying save issue
-        return WeekStrings(self.rOfWeeks.save())
+        return WeekStringsRange(self.rOfWeeks.save())
+weekStrings = unary1('weekStrings', unary1, WeekStringsRange)
 
 
-# ?monthTitle
 @pipeable
-def MonthTitle(month, width):
-    return month >> MonthLongName >> CJust(width)
+def monthTitle(month, width):
+    return month >> monthLongName >> cjust(_, width)
 
 
-# ?formatMonth
 @pipeable
-def MonthLines(monthDays):
+def monthLines(monthDays):
     return [
-        MonthTitle(monthDays.front.month, 21) >> WrapInList >> IndexableFR,
-        monthDays >> WeekChunks >> WeekStrings
-    ] >> ChainAsSingleRange
+        monthDays.front.month >> monthTitle(_, 21) >> wrapInList >> toIndexableFR,
+        monthDays >> weekChunks >> weekStrings
+    ] >> rChain
 
 
 @pipeable
-def MonthStringsToCalendarRow(strings, blank, sep):
-    return strings >> Materialise >> ReplaceWith(Null, blank) >> JoinUsing(sep)
-
-# ?pasteBlocks
-def PasteBlocks(rOfMonthChunk):
-    return rOfMonthChunk >> RRaggedZip >> RMap >> MonthStringsToCalendarRow(" "*21, " ")
+def monthStringsToCalendarRow(strings, blank, sep):
+    return strings >> materialise >> replaceWith(Null, blank) >> join(_, sep)
 
 
+def pasteBlocks(rOfMonthChunk):
+    return rOfMonthChunk >> RaggedZipIR >> rEach >> monthStringsToCalendarRow(" "*21, " ")
 

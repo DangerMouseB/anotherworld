@@ -4,9 +4,10 @@
 #
 # *******************************************************************************
 
-from coppertop import assertRaises
-from bones_pipe.std import assertEquals
-from coppertop import pipeable, nullary, rau, binary, ternary
+
+
+from coppertop.std import assertEquals
+from coppertop import pipeable, nullary, rau, binary, ternary, assertRaises
 
 
 def prettyArgs(*args):
@@ -70,7 +71,7 @@ def testNullary():
 
     with assertRaises(SyntaxError) as e:
         nullary1(...)(1, 2)
-    e.exceptionValue.args[0] >> assertEquals >> 'too many args - got 2 needed 1'
+    e.exceptionValue.args[0] >> assertEquals >> 'nullary1 - too many args - got 2 needed 1'
 
     with assertRaises(SyntaxError) as e:
         2 >> nullary2(1, ...)
@@ -84,7 +85,7 @@ def testUnary():
 
     with assertRaises(SyntaxError) as e:
         unary1(...)(1, 2)
-    e.exceptionValue.args[0] >> assertEquals >> 'too many args - got 2 needed 1'
+    e.exceptionValue.args[0] >> assertEquals >> 'unary1 - too many args - got 2 needed 1'
 
     with assertRaises(SyntaxError) as e:
         2 >> unary3(1, ..., ...)
@@ -100,7 +101,7 @@ def testRau():
 
     with assertRaises(SyntaxError) as e:
         rau1(...)(1, 2)
-    e.exceptionValue.args[0] >> assertEquals >> 'too many args - got 2 needed 1'
+    e.exceptionValue.args[0] >> assertEquals >> 'rau1 - too many args - got 2 needed 1'
 
     with assertRaises(SyntaxError) as e:
         rau3(1, ..., ...) >> 2

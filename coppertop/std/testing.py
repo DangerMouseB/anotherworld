@@ -21,7 +21,7 @@ def assertEquals(actual, expected, suppressMsg=False, keepWS=False, returnResult
         act = actual.replace(" ", "").replace("\n", "") if isinstance(actual, (str,)) else actual
         exp = expected.replace(" ", "").replace("\n", "") if isinstance(expected, (str,)) else expected
     if isinstance(act, (int, float)) and isinstance(exp, (int, float)):
-        equal = act >> closeTo(tolerance=tolerance) >> exp
+        equal = act >> closeTo(..., ..., tolerance=tolerance) >> exp
     else:
         equal = act == exp
     if returnResult:
@@ -38,3 +38,4 @@ def assertEquals(actual, expected, suppressMsg=False, keepWS=False, returnResult
                 raise AssertionError('expected %s but got %s' % (expected, actual))
         else:
             return None
+

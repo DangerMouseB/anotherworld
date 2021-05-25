@@ -8,6 +8,6 @@
 from .._pipe import unary1, unary
 
 
-def Not(b):
+def not_(b):
     return False if b else True
-Not = unary1('Not', unary, Not)
+not_ = unary1('not_', unary, not_)

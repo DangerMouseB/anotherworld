@@ -18,7 +18,7 @@
 
 
 
-from .._testing import HookStdOutErrToLines, assertRaises
+from coppertop._testing import HookStdOutErrToLines, assertRaises
 
 
 def testStdoutHooker():

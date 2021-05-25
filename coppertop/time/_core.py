@@ -4,6 +4,12 @@
 #
 # *******************************************************************************
 
+from __future__ import annotations
+
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
+
 # TODO handle offset formats
 # TODO handle locales
 
@@ -67,8 +73,12 @@ import math
 from _strptime import _strptime
 from collections import namedtuple
 
-from coppertop._pipe import pipeable, Missing
+from .. import Missing
+from .._pipe import pipeable
 from ._enums import ObserversCtx, FpMLCity, IanaCity, IanaTz, Precision, FpMLCityForName, IanaCityForName, IanaTzForName
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__ + ' - imports done')
+
 
 _YMDHMSSPZ = namedtuple('_YMDHMSSPZ', ['y', 'M', 'd', 'h', 'm', 's', 'ss', 'p', 'z'])
 
@@ -93,7 +103,6 @@ def overload(*types):
         fnName = function.__name__
         return _dispatcherByFnName.setdefault(fnName, _Dispatcher(fnName)).register(types, function)
     return registerMultiMethod
-
 
 
 class AbstractDate(_date):
@@ -308,7 +317,7 @@ MM_DD_YYYY = 6
 # etc tbc
 
 @pipeable
-def ParseAbstractDate(format, s, locale=Missing):
+def parseAbstractDate(s, format, locale=Missing):
     if isinstance(format, int):
 
         if format == YY_MM_DD:
@@ -341,26 +350,26 @@ def ParseAbstractDate(format, s, locale=Missing):
         return AbstractDate(*args[0:3])
 
 @pipeable
-def ParseAbstractTimeOfDay(format, s, locale=Missing):
+def ParseAbstractTimeOfDay(s, format, locale=Missing):
     pass
 
 @pipeable
-def ParseAbstractDateTime(format, s, locale=Missing):
+def ParseAbstractDateTime(s, format, locale=Missing):
     args = _parseDTTz(s, format)
     assert args[-1] == None
     return AbstractDateTime(*args[0:8])
 
 @pipeable
-def ParseObservedTimeOfDay(format, s, locale=Missing):
+def ParseObservedTimeOfDay(s, format, locale=Missing):
     pass
 
 @pipeable
-def ParseObservedDateTime(format, s, locale=Missing):
+def ParseObservedDateTime(s, format, locale=Missing):
     # "2020.01.01 16:15 GBLN" >> ToDateTimeTz
     pass
 
 @pipeable
-def ParseObserversCtx(format, s, locale=Missing):
+def ParseObserversCtx(s, format, locale=Missing):
     pass
 
 @pipeable
@@ -384,7 +393,6 @@ def ParseOffsetTz(s, locale=Missing):
 # *******************************************************************************
 # String Formatting
 # *******************************************************************************
-
 
 @overload(AbstractDate)
 def ToString(format, ad, locale=Missing):
@@ -410,8 +418,7 @@ def ToString(format, otd, locale=Missing):
 def ToString(format, oc, locale=Missing):
     return repr(oc)
 
-ToString = pipeable(ToString)
-
+#ToString = pipeable(ToString)   # MUSTDO fix
 
 
 # *******************************************************************************
@@ -484,16 +491,17 @@ class DaySecond(object):
         # days, seconds
         # days, seconds, subseconds, precision
 
-# @pipeable(ds=DaySecond, utc=ObservedDateTime)
 @pipeable
-def AddPeriod(ds, utc):
-    # typical usage aDate >> AddPeriod(dt)
+def addPeriod(utc, ds):
+    # typical usage aDate >> addPeriod(dt)
     assert utc.ctx == IanaTz.UTC
     pyDT = utc._datetime + _timedelta(ds.days, ds.second, ds.milli )
     return ObservedDateTime(pyDT.year, pyDT.month, pyDT.day)
 
 @pipeable
-def AddPeriod(ds, ad):
-    # typical usage anAbstractDate >> AddPeriod(dt)
+def addPeriod(ad, ds):
+    # typical usage anAbstractDate >> addPeriod(dt)
     pyDT = ad + _timedelta(ds.days)
     return AbstractDate(pyDT.year, pyDT.month, pyDT.day)
+
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__ + ' - done')

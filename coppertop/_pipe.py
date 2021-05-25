@@ -4,18 +4,17 @@
 #
 # *******************************************************************************
 
-# FlavouredPipe
+
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
 import inspect, types
 from ._core import ProgrammerError, NotYetImplemented
-
-
+from . import _skip
 
 class _DeferredArg():
     def __repr__(self):
         return '...'
-
-
 DeferredArg = _DeferredArg()
 
 
@@ -26,9 +25,11 @@ class Pipeable(object):
         p.fn = fn
 
     def __call__(p, *args, **kwargs):
+        "ENT"
         return p.flavour(p, False, args >> substituteEllipses, kwargs)
 
     def __rrshift__(p, arg):  # arg >> p
+        "ENT"
         if p.flavour.numLeft == 0:
             raise SyntaxError(f'arg >> {p.name} - illegal syntax for a {p.flavour.name}')
         else:
@@ -37,6 +38,7 @@ class Pipeable(object):
             return df.__rrshift__(arg)
 
     def __rshift__(p, arg):  # p >> arg
+        "ENT"
         if p.flavour.numLeft == 0 and p.flavour.numRight > 0:
             # only rau can handle this case
             args = [DeferredArg] * p.flavour.numRight
@@ -74,6 +76,7 @@ class PartialCall(object):
             return pc
 
     def __call__(pc, *args, **kwargs):
+        "ENT"
         syntaxErrIf(pc.isPiping, f'syntax not of form {prettyForm(pc.__class__)}')
         syntaxErrIf(count(args) > count(pc.iDefArgs), f'{pc.p.name} - too many args - got {count(args)} needed {count(pc.iDefArgs)}')
         newArgs = pc.args >> atPut(..., pc.iDefArgs[0:count(args)], args >> substituteEllipses)
@@ -81,6 +84,7 @@ class PartialCall(object):
         return pc.__class__(pc.p, pc.isPiping, newArgs, newKwargs)
 
     def __rrshift__(pc, arg):  # arg >> pc
+        "ENT"
         if pc.numLeft == 0:
             # if we are here then the arg does not implement __rshift__ so this is a syntax error
             syntaxErrIf(True, f'syntax not of form {prettyForm(pc.__class__)}')
@@ -92,6 +96,7 @@ class PartialCall(object):
             return pc.__class__(pc.p, True, newArgs, pc.kwargs)
 
     def __rshift__(pc, arg):  # pc >> arg
+        "ENT"
         if pc.numRight == 0:
             return NotImplemented
         else:
@@ -160,23 +165,28 @@ class ternary(PartialCall):
 
 class unary1(Pipeable):
     names = 'unary1'
-    def __call__(p, *args, **kwargs):
+    def __call__(p, *args, **kwargs):#@DontTrace
+        "ENT"
         return p.fn(*args, **kwargs)
-    def __rrshift__(p, arg):  # arg >> p
+    def __rrshift__(p, arg): #@DontTrace # arg >> p
+        "ENT"
         return p.fn(arg)
 
 
 class binary2(Pipeable):
     names = 'binary2'
-    def __call__(b2, *args, **kwargs):
+    def __call__(b2, *args, **kwargs):#@DontTrace
+        "ENT"
         return b2.fn(*args, **kwargs)
-    def __rrshift__(b2, arg1):  # arg1 >> b2
+    def __rrshift__(b2, arg1):  #@DontTrace  # arg1 >> b2
+        "ENT"
         return partialBinary2(b2.fn, arg1)
 class partialBinary2(object):
-    def __init__(pb2, fn, arg1):
+    def __init__(pb2, fn, arg1):#@DontTrace
         pb2.fn = fn
         pb2.arg1 = arg1
-    def __rshift__(pb2, arg2):  # b2 >> arg2
+    def __rshift__(pb2, arg2):#@DontTrace  # b2 >> arg2
+        "ENT"
         return pb2.fn(pb2.arg1, arg2)
 
 
@@ -209,7 +219,8 @@ def pipeable(*args, flavour=unary):
     def registerFn(fn):
         if isinstance(fn, type):
             # class
-            raise TypeError(f'Can\'t wrap classes - "{fn.__name__}"')
+            pass
+            # raise TypeError(f'Can\'t wrap classes - "{fn.__name__}"')
 
         # function
         # _ret = inspect.signature(fn).return_annotation

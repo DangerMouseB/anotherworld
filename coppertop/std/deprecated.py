@@ -5,22 +5,25 @@
 # *******************************************************************************
 
 
-from coppertop import pipeable
+from coppertop import pipeable, unary1
 
 
-@pipeable
+@pipeable(flavour=unary1)
 def toStr(x):
     return str(x)
 
-@pipeable
+@pipeable(flavour=unary1)
 def toInt(a):
     return int(a)
 
-@pipeable
+@pipeable(flavour=unary1)
 def toRepr(x):
     return str(x)
 
-@pipeable
+@pipeable(flavour=unary1)
 def toString(format, x):
     raise NotImplementedError('ToString')
 
+@pipeable(flavour=unary1)
+def toList(x):
+    return list(x)

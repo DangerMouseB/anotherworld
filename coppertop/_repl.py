@@ -22,13 +22,16 @@ class _callFReturnX(object):
         self.f1 = lambda x:x
         self.pp = pp
     def __rrshift__(self, other):   # other >> self
+        "ENT"
         self.f2(self.f1(other))
         self.f1 = lambda x: x
         return other
     def __call__(self, f1):
+        "ENT"
         self.f1 = f1
         return self
     def __lshift__(self, other):    # self << other
+        "ENT"
         self.f2(self.f1(other))
         self.f1 = lambda x: x
         return self

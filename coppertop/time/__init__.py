@@ -4,6 +4,11 @@
 #
 # *******************************************************************************
 
+from __future__ import annotations
+
+import sys
+if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+
 
 _all = set()
 
