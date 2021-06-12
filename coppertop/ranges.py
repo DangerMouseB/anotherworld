@@ -17,6 +17,17 @@ from ._core import Null
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__ + ' - imports done')
 
 
+if not hasattr(sys, '_EMPTY'):
+    class _EMPTY(object):
+        def __bool__(self):
+            return False
+        def __repr__(self):
+            # for pretty display in pycharm debugger
+            return 'EMPTY'
+    sys._EMPTY = _EMPTY()
+EMPTY = sys._EMPTY
+
+
 # d style ranges
 # http://www.informit.com/articles/printerfriendly/1407357 - Andrei Alexandrescu
 # https://www.drdobbs.com/architecture-and-design/component-programming-in-d/240008321 - Walter Bright
@@ -122,17 +133,6 @@ def toIRangeIfNot(x):
         return x
     else:
         return IndexableFR(x)
-
-
-if not hasattr(sys, '_EMPTY'):
-    class _EMPTY(object):
-        def __bool__(self):
-            return False
-        def __repr__(self):
-            # for pretty display in pycharm debugger
-            return 'EMPTY'
-    sys._EMPTY = _EMPTY()
-EMPTY = sys._EMPTY
 
 
 class FnAdapterFR(IForwardRange):

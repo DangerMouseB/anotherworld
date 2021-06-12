@@ -18,7 +18,7 @@
 
 
 
-from coppertop.std import assertEquals, rEach, materialise, rChain
+from coppertop.std import assertEquals, rEach, materialise, rChain, take
 from coppertop.ranges import IndexableFR, ListOR, getIRIter
 
 
@@ -41,10 +41,20 @@ def test_rangeOrRanges():
 def test_other():
     [1, 2, 3] >> rEach >> (lambda x: x) >> materialise >> assertEquals >> [1, 2, 3]
 
+def test_take():
+    r1 = IndexableFR([1,2,3])
+    r2 = r1 >> take(_, 3)
+    r1.popFront >> assertEquals >> 1
+    r3 = r1 >> take(_, 4)
+    r2 >> materialise >> assertEquals >> [1,2,3]
+    r3 >> materialise >> assertEquals >> [2,3]
+
+
 def main():
     test_listRanges()
     test_rangeOrRanges()
     test_other()
+    test_take()
     print('pass')
 
 

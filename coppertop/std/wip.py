@@ -5,9 +5,10 @@
 # *******************************************************************************
 
 
-from .._pipe import unary1, unary
+from .._pipe import unary1
 
 
 def not_(b):
     return False if b else True
-not_ = unary1('not_', unary, not_)
+not_ = unary1('not_', unary1, not_)
+Not = unary1('Not', unary1, not_)
