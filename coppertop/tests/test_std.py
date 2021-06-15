@@ -21,6 +21,12 @@ import operator
 from coppertop.std import assertEquals, _, inject, each, eachAsArgs
 from coppertop import pipeable
 
+
+def test_adverbs():
+    from ..std.adverbs import _test_inject
+    _test_inject()
+
+
 def test_stuff():
     2 >> assertEquals >> 2
 
@@ -39,6 +45,7 @@ def test_stuff():
 
 
 def main():
+    test_adverbs()
     test_stuff()
     print('pass')
 

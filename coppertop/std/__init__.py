@@ -35,6 +35,6 @@ from .testing import *
 from .to_sort import *
 from .wip import *
 
-_ = ...
+from ._core import _
 
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)

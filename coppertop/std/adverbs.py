@@ -11,9 +11,11 @@ if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 import itertools, builtins
 import numpy as np
 
-from .._pipe import pipeable, binary, ternary, binary2, unary1, unary
+from .._pipe import pipeable, unary1, binary, binary2, ternary
 from .struct import struct, _nd, nd
 from ..ranges import EachFR, ChainAsSingleFR, UntilFR
+from .testing import assertEquals
+from ._core import _
 
 
 @pipeable(flavour=ternary)
@@ -24,9 +26,10 @@ def both(a, f, b):
                 z[...] = f(x,y)
             return nd(it.operands[2])
     else:
-        return [f(x, y) for (x, y) in zip(a, b)]
+        return [f(x, y) for (x, y) in builtins.zip(a, b)]
 
 
+@pipeable(flavour=binary2)
 def each(xs, f):
     """each(xs, f)  e.g. xs >> each >> f
     Answers [f(x) for x in xs]"""
@@ -38,34 +41,39 @@ def each(xs, f):
             return nd(it.operands[len(inputsAndOutput)-1])
     else:
         return [f(x) for x in xs]
-each = binary2('each', binary, each)
 
 rEach = binary2('rEach', binary2, EachFR)
 rChain = unary1('rChain', unary1, ChainAsSingleFR)
 rUntil = binary2('rUntil', binary2, UntilFR)
 
+
+@pipeable(flavour=binary2)
 def ieach(xs, f2):
     """each(xs, f)  e.g. xs >> each >> f
     Answers [f(i, x) for x in enumerate(xs)]"""
     return [f2(i, x) for (i, x) in enumerate(xs)]
-ieach = binary2('ieach', binary, ieach)
 
 
+@pipeable(flavour=binary2)
 def filter(xs, f):
     """each(xs, f)  e.g. xs >> filter >> f
     Answers [x for x in xs if f(x)]"""
     return [x for x in xs if f(x)]
-filter = binary2('filter', binary, filter)
 
 
 @pipeable(flavour=binary)
 def inject(xs, seed, f2):
     prior = seed
+    #hmmm
     for x in xs:
         prior = f2(prior, x)
     return prior
 
+def _test_inject():
+    [1,2,3] >> inject(_,0,_) >> (lambda a,b: a + b) >> assertEquals >> 6
 
+
+@pipeable(flavour=binary2)
 def chunkUsing(iter, fn2):
     answer = []
     i0 = 0
@@ -75,14 +83,13 @@ def chunkUsing(iter, fn2):
             i0 = i1 + 1
     answer += [iter[i0:]]
     return answer
-chunkUsing = binary2('chunkUsing', binary, chunkUsing)
 
 
 def _pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = itertools.tee(iterable)
     next(b, None)
-    return zip(a, b)
+    return builtins.zip(a, b)
 
 
 @pipeable(flavour=unary1)
