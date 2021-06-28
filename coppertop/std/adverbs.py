@@ -64,7 +64,6 @@ def filter(xs, f):
 @pipeable(flavour=binary)
 def inject(xs, seed, f2):
     prior = seed
-    #hmmm
     for x in xs:
         prior = f2(prior, x)
     return prior

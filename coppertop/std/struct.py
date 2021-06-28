@@ -128,16 +128,47 @@ class _nd(object):
             self.nd = x
         else:
             self.nd = np.array(x)
+
+    @property
+    def T(self):
+        return nd(self.nd.T)
+
+    @property
+    def conj(self):
+        return nd(self.nd.conj())
+
     def __add__(self, other):
         return nd(self.nd + (other.nd if isinstance(other, _nd) else other))
+    def __radd__(self, other):
+        return nd((other.nd if isinstance(other, _nd) else other) + self.nd)
+
+    def __sub__(self, other):
+        return nd(self.nd - (other.nd if isinstance(other, _nd) else other))
+    def __rsub__(self, other):
+        return nd((other.nd if isinstance(other, _nd) else other) - self.nd)
+
     def __mul__(self, other):
         return nd(self.nd * (other.nd if isinstance(other, _nd) else other))
+    def __rmul__(self, other):
+        return nd((other.nd if isinstance(other, _nd) else other) * self.nd)
+
+    def __truediv__(self, other):
+        return nd(self.nd / (other.nd if isinstance(other, _nd) else other))
+    def __rtruediv__(self, other):
+        return nd((other.nd if isinstance(other, _nd) else other) / self.nd)
+
+    def __matmul__(self, other):
+        return nd(self.nd @ (other.nd if isinstance(other, _nd) else other))
+    def __rmatmul__(self, other):
+        return nd((other.nd if isinstance(other, _nd) else other) @ self.nd)
+
     def __lt__(self, other):
         return nd(self.nd < (other.nd if isinstance(other, _nd) else other))
     def __gt__(self, other):
         return nd(self.nd > (other.nd if isinstance(other, _nd) else other))
     def __and__(self, other):
         return nd(self.nd & (other.nd if isinstance(other, _nd) else other))
+
     def __repr__(self):
         return repr(self.nd)
     def __rrshift__(self, other):

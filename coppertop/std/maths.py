@@ -13,12 +13,13 @@ _EPS = 7.105427357601E-15      # i.e. double precision
 import builtins
 
 from .._core import Missing
-from .._pipe import pipeable, binary
+from .._pipe import pipeable, binary, binary2
+from .struct import struct, nd
 
 try:
-    import numpy
+    import numpy as np
 except:
-    numpy = Missing
+    np = Missing
 
 
 @pipeable(flavour=binary)
@@ -36,16 +37,16 @@ def within(x, a, b):
 @pipeable
 def mean(ndOrPy):
     # should do full numpy?
-    return numpy.mean(ndOrPy)
+    return np.mean(ndOrPy)
 
 @pipeable
 def std(ndOrPy, dof=0):
     # should do full numpy? std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=<no value>)
-    return numpy.std(ndOrPy, dof)
+    return np.std(ndOrPy, dof)
 
 @pipeable
 def sqrt(x):
-    return numpy.sqrt(x)
+    return np.sqrt(x)
 
 @pipeable
 def max(iter):
@@ -54,3 +55,26 @@ def max(iter):
 @pipeable
 def min(iter):
     return builtins.min(iter)
+
+
+@pipeable
+def QRDecomp(A):
+    Q, R = np.linalg.qr(A.nd)
+    return struct(Q=nd(Q), R=nd(R))
+
+@pipeable
+def CholeskyDecomp(A):
+    return nd(np.linalg.cholesky(A.nd))
+
+@pipeable
+def inv(A):
+    return nd(np.linalg.inv(A.nd))
+
+
+# @pipeable(flavour=binary2)
+# def dot(A, B):
+#     return nd(np.dot(A.nd, B.nd))
+#
+# @pipeable(flavour=binary2)
+# def mmul(A, B):
+     return nd(A.nd @ B.nd)
