@@ -77,4 +77,4 @@ def inv(A):
 #
 # @pipeable(flavour=binary2)
 # def mmul(A, B):
-     return nd(A.nd @ B.nd)
+#     return nd(A.nd @ B.nd)
