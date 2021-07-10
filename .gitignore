@@ -6,12 +6,16 @@
 .idea/modules.xml
 *.gz
 *.gz
-MANIFEST
-coppertop.egg-info/dependency_links.txt
-coppertop.egg-info/PKG-INFO
-coppertop.egg-info/SOURCES.txt
-coppertop.egg-info/top_level.txt
-MANIFEST
-MANIFEST
+pypi/coppertop/MANIFEST
+pypi/coppertop/coppertop.egg-info/dependency_links.txt
+pypi/coppertop/coppertop.egg-info/PKG-INFO
+pypi/coppertop/coppertop.egg-info/SOURCES.txt
+pypi/coppertop/coppertop.egg-info/top_level.txt
+pypi/coppertop/MANIFEST
+pypi/coppertop/MANIFEST
 
 .DS_Store
+
+pypi/core/core
+
+pypi/dm/dm
