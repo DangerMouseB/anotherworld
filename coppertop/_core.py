@@ -12,17 +12,9 @@
 import sys
 if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
 
-
+from ._sentinels import Missing
 # something should / could be there but it is missing
-if not hasattr(sys, '_Missing'):
-    class Missing(object):
-        def __bool__(self):
-            return False
-        def __repr__(self):
-            # for pretty display in pycharm debugger
-            return 'Missing'
-    sys._Missing = Missing()
-Missing = sys._Missing
+
 
 
 # the null set
