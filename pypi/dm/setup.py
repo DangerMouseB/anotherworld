@@ -6,17 +6,17 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-version = '0.1.0'
+version = '0.1.1'
 
 
 setup(
   name='coppertop-dm',
   packages=[
-    'coppertop_',
-    'coppertop_.dm',
-    'coppertop_.dm.tests',
+    'coppertop',
+    'coppertop.dm',
+    'coppertop.dm.tests',
   ],
-  package_dir = {'': 'dm'},
+  # package_dir = {'': 'dm'},
   # namespace_packages=['coppertop_'],
   version=version,
   python_requires='>=3.8',
@@ -29,7 +29,7 @@ setup(
   url = 'https://github.com/DangerMouseB/coppertop',
   download_url = '',
   # download_url = f'https://github.com/DangerMouseB/coppertop/archive/{version}.tar.gz',
-  keywords = ['piping', 'pipeline', 'pipe', 'functional'],
+  keywords = ['bayesian'],
   install_requires=['coppertop'],
   include_package_data=True,
   classifiers=[

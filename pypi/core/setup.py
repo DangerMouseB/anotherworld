@@ -6,7 +6,7 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-version = '0.3.5'
+version = '0.3.6'
 
 # print(find_packages())
 
@@ -16,13 +16,12 @@ setup(
   packages=[
     'coppertop',
     'coppertop.tests',
-    'coppertop_',
-    'coppertop_.pipe',
-    'coppertop_.pipe.tests',
-    'coppertop_.std',
-    'coppertop_.std.tests',
+    'coppertop.pipe',
+    'coppertop.pipe.tests',
+    'coppertop.std',
+    'coppertop.std.tests',
   ],
-  package_dir = {'': 'core'},
+  # package_dir = {'': 'core'},
   # namespace_packages=['coppertop_'],
   version=version,
   python_requires='>=3.8',

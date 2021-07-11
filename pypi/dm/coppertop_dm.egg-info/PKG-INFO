@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: coppertop-dm
+Version: 0.1.1
+Summary: Some stats utils for bayesian analysis
+Home-page: https://github.com/DangerMouseB/coppertop
+Author: David Briant
+Author-email: dangermouseb@forwarding.cc
+License: BSD
+Keywords: bayesian
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Utilities
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+
+some stats utils for bayesian analysis
+
+
