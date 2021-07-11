@@ -5,7 +5,7 @@
 # *******************************************************************************
 
 import sys
-if hasattr(sys, '_ImportTrace') and sys._ImportTrace: print(__name__)
+if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 def ensureSingletons():
