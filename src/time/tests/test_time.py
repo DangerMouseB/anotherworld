@@ -5,12 +5,12 @@
 # *******************************************************************************
 
 from coppertop.std import assertEquals
-from .._core import AbstractDateTime, AbstractDate, ObservedTimeOfDay, ObservedDateTime, AbstractTimeOfDay, Precision, \
+from coppertop.time import AbstractDateTime, AbstractDate, ObservedTimeOfDay, ObservedDateTime, AbstractTimeOfDay, Precision, \
     ParseAbstractDateTime, parseAbstractDate, ParseObservedTimeOfDay, ParseObservedDateTime, ParseObserversCtx, ParseAbstractTimeOfDay, \
     ToString, \
     ObserversCtx, FpMLCity, IanaCity, IanaTz, \
     YYYY_MM_DD
-from .._core import _parseDTTz
+from coppertop.time._core import _parseDTTz
 
 
 
@@ -75,10 +75,9 @@ def main():
     test_parsing()
     test_formatting()
     test_tzConversion()
-    print('pass')
 
 
 if __name__ == '__main__':
     main()
-
+    print('pass')
 

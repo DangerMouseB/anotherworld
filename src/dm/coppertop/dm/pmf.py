@@ -8,7 +8,7 @@
 import numpy as np
 import scipy.stats
 from coppertop.bits import pipeable, binary, unary1
-from coppertop.std import sort, fvPairs, struct, both, values
+from coppertop.std import sort, fvPairs, struct, both, values, fields
 
 from .misc import sequence
 
@@ -53,7 +53,7 @@ def mix(*args):
 
 @pipeable(flavour=unary1)
 def mean(pmf):
-    return np.average(list(pmf.keys()), weights=list(pmf.values()))
+    return np.average(list(pmf >> fields), weights=list(pmf >> values))
     # if pmf:
     #     answer = 0
     #     for x, p in pmf >> fvPairs:

@@ -35,9 +35,9 @@ def test_stuff():
 def main():
     test_adverbs()
     test_stuff()
-    print('pass')
 
 
 if __name__ == '__main__':
     main()
+    print('pass')
 

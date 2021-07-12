@@ -40,9 +40,9 @@ from . _core import Missing, Null, Err, ProgrammerError, UnhappyWomble, PathNotT
 # the following are wrapped in exception handlers to make test driven development and debugging of coppertop easier
 
 try:
-    from . import testing
     from .testing import *
-    _all.update(_getPublicMembersOnly(testing))
+    from . import testing as _mod
+    _all.update(_getPublicMembersOnly(_mod))
 except:
     pass
 
@@ -53,18 +53,18 @@ except:
     pass
 
 try:
-    from . import repl
-    from .repl import *
-    _all.update(_getPublicMembersOnly(repl))
+    from .utils import *
+    from . import utils as _mod
+    _all.update(_getPublicMembersOnly(_mod))
 except:
     pass
 
-# try:
-#     import coppertop.range
-#     from coppertop.range._range import *
-#     _all.update(_getPublicMembersOnly(coppertop.range))
-# except:
-#     pass
+try:
+    from .repl import *
+    from . import repl as _mod
+    _all.update(_getPublicMembersOnly(_mod))
+except:
+    pass
 
 
 _all =list(_all)
@@ -73,3 +73,4 @@ __all__ = _all
 
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - done')
+

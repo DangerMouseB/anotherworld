@@ -5,7 +5,6 @@
 # *******************************************************************************
 
 
-
 from coppertop.bits import pipeable, unary1, binary2, unary, NotYetImplemented
 from coppertop.range import EachFR, ChainAsSingleFR, UntilFR
 from coppertop.range import materialise as _rMaterialise, IInputRange

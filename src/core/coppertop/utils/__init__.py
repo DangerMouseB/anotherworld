@@ -4,6 +4,10 @@
 #
 # *******************************************************************************
 
+import sys
+if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-from ._range import *
-from .std import *
+
+from .module import *
+
+if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - done')

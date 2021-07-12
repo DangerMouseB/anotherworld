@@ -56,10 +56,10 @@ def main():
     test_rangeOrRanges()
     test_other()
     test_take()
-    print('pass')
 
 
 if __name__ == '__main__':
     main()
+    print('pass')
 
 

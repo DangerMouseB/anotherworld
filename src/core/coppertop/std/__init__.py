@@ -15,7 +15,6 @@ from .deprecated import *
 from .files import *
 from .maths import *
 from .misc import *
-from .module import *
 from .stdio import *
 from .string import *
 from .struct import *

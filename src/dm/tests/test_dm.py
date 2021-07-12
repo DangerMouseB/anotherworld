@@ -18,9 +18,9 @@ def test_misc():
 
 def main():
     test_misc()
-    print('pass')
 
 
 if __name__ == '__main__':
     main()
+    print('pass')
 

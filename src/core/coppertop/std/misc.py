@@ -24,7 +24,7 @@ def getAttr(x, name):
 dict_keys = type({}.keys())
 dict_values = type({}.values())
 def materialise(x):
-    if isinstance(x, dict_keys):
+    if isinstance(x, (dict_keys, dict_values)):
         return list(x)
     else:
         raise NotYetImplemented()

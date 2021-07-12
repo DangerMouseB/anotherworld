@@ -6,7 +6,7 @@
 
 
 from coppertop.bits import pipeable
-from coppertop.std import fvPairs, each, join
+from coppertop.std import fvPairs, each, join, struct
 
 @pipeable
 def formatStruct(s, name, keysFormat, valuesFormat, sep):
@@ -17,3 +17,6 @@ def formatStruct(s, name, keysFormat, valuesFormat, sep):
         return f'{k}={v}'
     return f'{name}({s >> fvPairs >> each >> formatKv >> join >> sep})'
 
+@pipeable
+def toStruct(kvs):
+    return struct(kvs)
