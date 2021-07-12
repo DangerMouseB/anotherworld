@@ -6,9 +6,6 @@ The purpose of the coppertop pipe operator is to allow code to be written in
 a more essay style format - i.e. left-to-right and top-to-bottom. The idea is 
 to make it easy to express the syntax (aka sequence) of a solution.
 
-Pyramid style (c.f. Barbara Minto) declarations are harder to do in python so
-this has not been attempted.
-
 @pipable provides for a few different syntaxes but here we focus on the three 
 main ones unary, binary and ternary.
 
@@ -23,7 +20,7 @@ where `...` is used as a sentinel place-holder for future arguments
 syntax: `A >> f(args)` -> `f(args)(A)`
 
 ```
-from coppertop import pipeable
+from coppertop.bits import pipeable
 from coppertop.std import _, anon
 
 @pipeable
@@ -46,7 +43,7 @@ def appendStr(x, y):
 syntax: `A >> f(args) >> B` -> `f(args)(A, B)`
 
 ```
-from coppertop import NotYetImplemented
+from coppertop.bits import NotYetImplemented
 from coppertop.std import each, inject
 
 @pipeable(flavour=binary)
