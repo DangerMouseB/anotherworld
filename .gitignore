@@ -23,3 +23,7 @@ pypi/dm/dm
 pypi/core/coppertop
 
 pypi/dm/coppertop
+
+coppertop.egg-info/
+
+pypi/dm/coppertop_dm.egg-info/
