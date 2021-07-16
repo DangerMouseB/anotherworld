@@ -32,14 +32,15 @@ def both(a, f, b):
 def each(xs, f):
     """each(xs, f)  e.g. xs >> each >> f
     Answers [f(x) for x in xs]"""
-    if isinstance(xs, struct):
-        inputsAndOutput = [x.nd for x in xs._values()] + [None]
-        with np.nditer(inputsAndOutput) as it:
-            for vars in it:
-                vars[-1][...] = f(*vars[:-1])
-            return nd(it.operands[len(inputsAndOutput)-1])
-    else:
-        return [f(x) for x in xs]
+    # if isinstance(xs, struct):
+    #     inputsAndOutput = [x.nd for x in xs._values()] + [None]
+    #     with np.nditer(inputsAndOutput) as it:
+    #         for vars in it:
+    #             vars[-1][...] = f(*vars[:-1])
+    #         return nd(it.operands[len(inputsAndOutput)-1])
+    # elif isinstance(xs, struct):
+    # else:
+    return [f(x) for x in xs]
 
 
 @pipeable(flavour=binary2)

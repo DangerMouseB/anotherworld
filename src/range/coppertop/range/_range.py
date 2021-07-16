@@ -14,7 +14,7 @@ from typing import Any, Union
 import types
 from coppertop.bits import pipeable, unary1
 from coppertop.pipe._pipe import Pipeable
-from coppertop._core import Null
+from coppertop._singletons import Null
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - imports done')
 

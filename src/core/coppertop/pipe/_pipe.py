@@ -9,7 +9,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 import inspect, types
-from coppertop._core import ProgrammerError, NotYetImplemented
+from coppertop._singletons import ProgrammerError, NotYetImplemented
 
 
 class _DeferredArg():

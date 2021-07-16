@@ -15,10 +15,16 @@ from .misc import sequence
 
 @pipeable
 def normalise(pmf):
-    factor = 1 / sum(pmf >> values)
+    # immutable, asssumes non-numeric values are tags and all numeric values are part of pmf
     answer = struct(pmf)
+    total = 0
     for k, v in answer >> fvPairs:
-        answer[k] = v * factor
+        if isinstance(v, (float, int)):
+            total += v
+    factor = 1/ total
+    for k, v in answer >> fvPairs:
+        if isinstance(v, (float, int)):
+            answer[k] = v * factor
     return answer
 
 

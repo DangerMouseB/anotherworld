@@ -34,7 +34,7 @@ def _getPublicMembersOnly(module):
     return [name for (name, o) in members]
 
 
-from . _core import Missing, Null, Err, ProgrammerError, UnhappyWomble, PathNotTested, NotYetImplemented
+from . _singletons import Missing, Null, Err, ProgrammerError, UnhappyWomble, PathNotTested, NotYetImplemented
 
 
 # the following are wrapped in exception handlers to make test driven development and debugging of coppertop easier
