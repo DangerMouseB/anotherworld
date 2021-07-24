@@ -57,7 +57,7 @@ class Pipeable(object):
         return p.name
 
     def dispatch(p, args, kwargs):
-        return p.fn(*args, **kwargs)
+         return p.fn(*args, **kwargs)
 
 
 class PartialCall(object):

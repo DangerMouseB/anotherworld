@@ -87,7 +87,8 @@ class struct(dict):
         if isinstance(fieldOrFields, (list, tuple)):
             fvs = {field: s[field] for field in fieldOrFields}
             return struct(fvs)
-        return super().__getitem__(fieldOrFields)
+        else:
+            return super().get(fieldOrFields, Missing)
     def __repr__(s):
         itemStrings = (f"{str(k)}={repr(v)}" for k, v in super().items())
         rep = "{}({})".format(type(s).__name__, ", ".join(itemStrings))
